@@ -1,1 +1,49 @@
 @import "tailwindcss";
+
+/* Custom JNE Colors */
+@layer utilities {
+  .text-jne-red {
+    color: #DB252F;
+  }
+  
+  .bg-jne-red {
+    background-color: #DB252F;
+  }
+  
+  .text-jne-orange {
+    color: #F89E2B;
+  }
+  
+  .bg-jne-orange {
+    background-color: #F89E2B;
+  }
+  
+  .text-jne-gold {
+    color: #A0936A;
+  }
+  
+  .bg-jne-gold {
+    background-color: #A0936A;
+  }
+  
+  .border-jne-red {
+    border-color: #DB252F;
+  }
+  
+  .focus\:ring-jne-red:focus {
+    --tw-ring-color: #DB252F;
+  }
+  
+  .focus\:border-jne-red:focus {
+    border-color: #DB252F;
+  }
+}
+
+/* Additional custom styles */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.container {
+  @apply mx-auto px-4 sm:px-6 lg:px-8;
+}
