@@ -4,6 +4,7 @@ import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
+import { TIPO_EXPEDIENTE_OPTIONS, TIPO_MATERIA_OPTIONS } from '../constants/options';
 
 interface FormData {
   num_expediente: string;
@@ -21,21 +22,6 @@ export const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const tipoExpedienteOptions = [
-    { value: '2', label: 'Acta Electoral' },
-    { value: '1', label: 'Inscripción de Lista' },
-    { value: '3', label: 'Publicidad Estatal' },
-    { value: '4', label: 'Propaganda Electoral' },
-    { value: '5', label: 'Nulidad Electoral' }
-  ];
-
-  const tipoMateriaOptions = [
-    { value: '1', label: 'Apelación' },
-    { value: '5', label: 'Solicitud Inscripción de Lista' },
-    { value: '2', label: 'Nulidad' },
-    { value: '3', label: 'Tacha' },
-    { value: '4', label: 'Vacancia' }
-  ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -127,7 +113,7 @@ export const Home: React.FC = () => {
               name="tipo_expediente"
               value={formData.tipo_expediente}
               onChange={handleInputChange}
-              options={tipoExpedienteOptions}
+              options={TIPO_EXPEDIENTE_OPTIONS}
               required
             />
             
@@ -136,7 +122,7 @@ export const Home: React.FC = () => {
               name="tipo_materia"
               value={formData.tipo_materia}
               onChange={handleInputChange}
-              options={tipoMateriaOptions}
+              options={TIPO_MATERIA_OPTIONS}
               required
             />
           </div>
