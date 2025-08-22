@@ -2,7 +2,7 @@
 
 export interface RequisitoData {
   nombre: string;
-  estado: 'CUMPLE' | 'NO_CUMPLE' | 'PARCIAL';
+  estado: 'CUMPLE' | 'NO_CUMPLE' | 'PARCIAL' | 'ALERTA';
   estado_texto: string;
   estado_color: 'green' | 'red' | 'yellow';
   descripcion: string;

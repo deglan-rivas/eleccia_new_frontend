@@ -5,6 +5,8 @@ import { InformeModal } from '../components/expediente/InformeModal';
 import { RequisitosTabs } from '../components/expediente/RequisitosTabs';
 import { ActionButtons } from '../components/buttons/ActionButtons';
 import { EditRequisitoModal } from '../components/modals/EditRequisitoModal';
+import { NormativasModal } from '../components/modals/NormativasModal';
+import { type SelectedNormativas } from '../types/normativa';
 
 export const ExpedienteDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +18,7 @@ export const ExpedienteDetail: React.FC = () => {
   const [hasChanges, setHasChanges] = useState(false);
   const [isEditRequisitoModalOpen, setIsEditRequisitoModalOpen] = useState(false);
   const [requisitoToEdit, setRequisitoToEdit] = useState<RequisitoData | null>(null);
+  const [isNormativasModalOpen, setIsNormativasModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -701,6 +704,60 @@ export const ExpedienteDetail: React.FC = () => {
     setIsEditRequisitoModalOpen(false);
   };
 
+  const handleGenerateResolution = () => {
+    // Check for alert requirements first
+    const alertRequirements = expediente?.tabs
+      .flatMap(tab => tab.requisitos || [])
+      .filter(req => req.estado === 'ALERTA').length || 0;
+
+    if (alertRequirements > 0) {
+      const confirmWithAlert = window.confirm(
+        `Existen ${alertRequirements} requisitos marcados como alerta. ¿Desea continuar con la generación de la resolución?`
+      );
+      if (!confirmWithAlert) {
+        return;
+      }
+    }
+
+    setIsNormativasModalOpen(true);
+  };
+
+  const handleConfirmNormativas = async (selectedNormativas: SelectedNormativas) => {
+    try {
+      // TODO: Implement actual API call
+      console.log('Generating resolution with normativas:', selectedNormativas);
+      
+      // Simulate API call
+      const response = await fetch(`/generar_resolucion?nombre_expediente=${encodeURIComponent(expediente?.nombre_expediente || '')}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+          normativas: selectedNormativas
+        })
+      });
+
+      if (response.ok) {
+        setIsNormativasModalOpen(false);
+        // TODO: Show success toast
+        alert('Resolución generada exitosamente');
+        // Optionally refresh the page or redirect
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        const error = await response.json();
+        throw new Error(error.detail || 'Error al generar la resolución');
+      }
+    } catch (error) {
+      console.error('Error generating resolution:', error);
+      alert(`Error al generar la resolución: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+    }
+  };
+
   return (
     <>
       {/* Información del Expediente */}
@@ -862,6 +919,7 @@ export const ExpedienteDetail: React.FC = () => {
         expedienteId={id || ''}
         onEditModeToggle={handleEditModeToggle}
         onSaveChanges={handleSaveChanges}
+        onGenerateResolution={handleGenerateResolution}
         editMode={editMode}
         hasChanges={hasChanges}
       />
@@ -879,6 +937,13 @@ export const ExpedienteDetail: React.FC = () => {
         onClose={() => setIsEditRequisitoModalOpen(false)}
         requisito={requisitoToEdit}
         onSave={handleSaveRequisito}
+      />
+
+      {/* Modal de Normativas */}
+      <NormativasModal
+        isOpen={isNormativasModalOpen}
+        onClose={() => setIsNormativasModalOpen(false)}
+        onConfirm={handleConfirmNormativas}
       />
     </>
   );

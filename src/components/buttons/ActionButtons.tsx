@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GenerateResolutionButton } from './GenerateResolutionButton';
 
 interface ActionButtonsProps {
   expedienteId: string;
   onEditModeToggle?: (editMode: boolean) => void;
   onSaveChanges?: () => Promise<void>;
+  onGenerateResolution?: () => void;
   editMode?: boolean;
   hasChanges?: boolean;
 }
@@ -13,6 +15,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   expedienteId,
   onEditModeToggle,
   onSaveChanges,
+  onGenerateResolution,
   editMode = false,
   hasChanges = false
 }) => {
@@ -117,6 +120,14 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
           Ver Resoluciones
         </button>
       </div>
+      
+      {/* Botón Generar Proyecto de Resolución */}
+      {onGenerateResolution && (
+        <GenerateResolutionButton
+          onClick={onGenerateResolution}
+          disabled={isSaving}
+        />
+      )}
     </div>
   );
 };
