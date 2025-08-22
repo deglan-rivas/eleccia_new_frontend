@@ -7,6 +7,7 @@ import { ActionButtons } from '../components/buttons/ActionButtons';
 import { EditRequisitoModal } from '../components/modals/EditRequisitoModal';
 import { NormativasModal } from '../components/modals/NormativasModal';
 import { type SelectedNormativas } from '../types/normativa';
+import expedienteService from '../services/expedienteService';
 
 export const ExpedienteDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,13 +26,20 @@ export const ExpedienteDetail: React.FC = () => {
       if (!id) return;
       
       setLoading(true);
+      setError(null);
+      
       try {
-        // TODO: Replace with actual API call
-        // const response = await fetch(`/api/expediente/${id}`);
-        // const data = await response.json();
+        const data = await expedienteService.getExpedienteDetail(id);
+        setExpediente(data);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Error al cargar los datos del expediente';
+        setError(errorMessage);
+        console.error('Error fetching expediente:', err);
         
-        // Production data
-        const mockData: ExpedienteDetailData = {
+        // Fallback to mock data in case of development/testing
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Using fallback mock data due to API error');
+          const mockData: ExpedienteDetailData = {
           nombre_expediente: 'EMC.2025000233',
           tipo_expediente: 'Proceso de inscripción de listas electorales',
           materia: 'Solicitud de inscripción',
@@ -645,9 +653,7 @@ export const ExpedienteDetail: React.FC = () => {
         };
         
         setExpediente(mockData);
-      } catch (err) {
-        setError('Error al cargar los datos del expediente');
-        console.error('Error fetching expediente:', err);
+        }
       } finally {
         setLoading(false);
       }
@@ -664,11 +670,44 @@ export const ExpedienteDetail: React.FC = () => {
     );
   }
 
-  if (error || !expediente) {
+  if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-        <strong className="font-bold">Error: </strong>
-        <span className="block sm:inline">{error || 'Expediente no encontrado'}</span>
+      <div className="max-w-5xl mx-auto mt-8">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+          <div className="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong className="font-bold">Error al cargar el expediente</strong>
+              <p className="text-sm mt-1">{error}</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm font-medium"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!expediente) {
+    return (
+      <div className="max-w-5xl mx-auto mt-8">
+        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative">
+          <div className="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <strong className="font-bold">Expediente no encontrado</strong>
+              <p className="text-sm mt-1">No se pudieron cargar los datos del expediente solicitado.</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -697,11 +736,23 @@ export const ExpedienteDetail: React.FC = () => {
     });
   };
 
-  const handleSaveRequisito = (requisitoId: string, estado: string, observacion: string) => {
-    // TODO: Implement save requisito functionality
-    console.log('Saving requisito:', { requisitoId, estado, observacion });
-    setHasChanges(true);
-    setIsEditRequisitoModalOpen(false);
+  const handleSaveRequisito = async (requisitoId: string, estado: string, observacion: string) => {
+    try {
+      if (!id) throw new Error('ID de expediente no encontrado');
+      
+      await expedienteService.saveRequisito(id, requisitoId, estado, observacion);
+      setHasChanges(true);
+      setIsEditRequisitoModalOpen(false);
+      
+      // Optionally refresh the expediente data to show updated changes
+      // const updatedData = await expedienteService.getExpedienteDetail(id);
+      // setExpediente(updatedData);
+      
+    } catch (error) {
+      console.error('Error saving requisito:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error al guardar el requisito';
+      alert(`Error: ${errorMessage}`);
+    }
   };
 
   const handleGenerateResolution = () => {
@@ -724,37 +775,34 @@ export const ExpedienteDetail: React.FC = () => {
 
   const handleConfirmNormativas = async (selectedNormativas: SelectedNormativas) => {
     try {
-      // TODO: Implement actual API call
-      console.log('Generating resolution with normativas:', selectedNormativas);
-      
-      // Simulate API call
-      const response = await fetch(`/generar_resolucion?nombre_expediente=${encodeURIComponent(expediente?.nombre_expediente || '')}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({
-          normativas: selectedNormativas
-        })
-      });
+      if (!expediente?.nombre_expediente) {
+        throw new Error('Nombre del expediente no encontrado');
+      }
 
-      if (response.ok) {
+      const response = await expedienteService.generateResolution(
+        expediente.nombre_expediente,
+        selectedNormativas
+      );
+
+      if (response.success) {
         setIsNormativasModalOpen(false);
-        // TODO: Show success toast
         alert('Resolución generada exitosamente');
-        // Optionally refresh the page or redirect
+        
+        // Optionally refresh the page or redirect to view the resolution
+        if (response.resolution_url) {
+          window.open(response.resolution_url, '_blank');
+        }
+        
         setTimeout(() => {
           window.location.reload();
         }, 1500);
       } else {
-        const error = await response.json();
-        throw new Error(error.detail || 'Error al generar la resolución');
+        throw new Error(response.message || 'Error al generar la resolución');
       }
     } catch (error) {
       console.error('Error generating resolution:', error);
-      alert(`Error al generar la resolución: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      alert(`Error al generar la resolución: ${errorMessage}`);
     }
   };
 
