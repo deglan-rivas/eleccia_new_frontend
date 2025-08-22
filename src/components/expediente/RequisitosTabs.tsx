@@ -6,9 +6,10 @@ import { CandidatoCard } from './CandidatoCard';
 interface RequisitosTabsProps {
   tabs: TabData[];
   onEditRequisito?: (requisito: RequisitoData) => void;
+  editMode?: boolean;
 }
 
-export const RequisitosTabs: React.FC<RequisitosTabsProps> = ({ tabs, onEditRequisito }) => {
+export const RequisitosTabs: React.FC<RequisitosTabsProps> = ({ tabs, onEditRequisito, editMode = false }) => {
   const [activeTab, setActiveTab] = useState(tabs[0]?.id || '');
 
   const handleTabClick = (tabId: string) => {
@@ -63,6 +64,7 @@ export const RequisitosTabs: React.FC<RequisitosTabsProps> = ({ tabs, onEditRequ
                       key={index}
                       candidato={candidato}
                       onEditRequisito={onEditRequisito}
+                      editMode={editMode}
                     />
                   ))}
                 </div>
@@ -76,6 +78,7 @@ export const RequisitosTabs: React.FC<RequisitosTabsProps> = ({ tabs, onEditRequ
                       key={reqIndex}
                       requisito={requisito}
                       onEdit={onEditRequisito}
+                      editMode={editMode}
                     />
                   ))}
                 </div>

@@ -4,6 +4,7 @@ import { type ExpedienteDetailData, type RequisitoData } from '../types/expedien
 import { InformeModal } from '../components/expediente/InformeModal';
 import { RequisitosTabs } from '../components/expediente/RequisitosTabs';
 import { ActionButtons } from '../components/buttons/ActionButtons';
+import { EditRequisitoModal } from '../components/modals/EditRequisitoModal';
 
 export const ExpedienteDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +14,8 @@ export const ExpedienteDetail: React.FC = () => {
   const [isInformeModalOpen, setIsInformeModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [isEditRequisitoModalOpen, setIsEditRequisitoModalOpen] = useState(false);
+  const [requisitoToEdit, setRequisitoToEdit] = useState<RequisitoData | null>(null);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -668,9 +671,8 @@ export const ExpedienteDetail: React.FC = () => {
   }
 
   const handleEditRequisito = (requisito: RequisitoData) => {
-    // TODO: Implement edit functionality
-    console.log('Edit requisito:', requisito);
-    setHasChanges(true);
+    setRequisitoToEdit(requisito);
+    setIsEditRequisitoModalOpen(true);
   };
 
   const handleEditModeToggle = (newEditMode: boolean) => {
@@ -690,6 +692,13 @@ export const ExpedienteDetail: React.FC = () => {
         resolve();
       }, 1000);
     });
+  };
+
+  const handleSaveRequisito = (requisitoId: string, estado: string, observacion: string) => {
+    // TODO: Implement save requisito functionality
+    console.log('Saving requisito:', { requisitoId, estado, observacion });
+    setHasChanges(true);
+    setIsEditRequisitoModalOpen(false);
   };
 
   return (
@@ -845,6 +854,7 @@ export const ExpedienteDetail: React.FC = () => {
       <RequisitosTabs 
         tabs={expediente.tabs}
         onEditRequisito={handleEditRequisito}
+        editMode={editMode}
       />
 
       {/* Botones de Acción */}
@@ -861,6 +871,14 @@ export const ExpedienteDetail: React.FC = () => {
         isOpen={isInformeModalOpen}
         onClose={() => setIsInformeModalOpen(false)}
         expedienteData={expediente}
+      />
+
+      {/* Modal de Edición de Requisito */}
+      <EditRequisitoModal
+        isOpen={isEditRequisitoModalOpen}
+        onClose={() => setIsEditRequisitoModalOpen(false)}
+        requisito={requisitoToEdit}
+        onSave={handleSaveRequisito}
       />
     </>
   );

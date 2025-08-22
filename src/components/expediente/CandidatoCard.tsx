@@ -5,9 +5,10 @@ import { RequisitoCard } from './RequisitoCard';
 interface CandidatoCardProps {
   candidato: CandidatoData;
   onEditRequisito?: (requisito: RequisitoData) => void;
+  editMode?: boolean;
 }
 
-export const CandidatoCard: React.FC<CandidatoCardProps> = ({ candidato, onEditRequisito }) => {
+export const CandidatoCard: React.FC<CandidatoCardProps> = ({ candidato, onEditRequisito, editMode = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getInitials = () => {
@@ -72,6 +73,7 @@ export const CandidatoCard: React.FC<CandidatoCardProps> = ({ candidato, onEditR
                 key={reqIndex}
                 requisito={requisito}
                 onEdit={onEditRequisito}
+                editMode={editMode}
               />
             ))}
           </div>
