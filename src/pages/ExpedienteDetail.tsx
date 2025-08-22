@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { type ExpedienteDetailData, type RequisitoData } from '../types/expediente';
 import { InformeModal } from '../components/expediente/InformeModal';
 import { RequisitosTabs } from '../components/expediente/RequisitosTabs';
+import { ActionButtons } from '../components/buttons/ActionButtons';
 
 export const ExpedienteDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -10,6 +11,8 @@ export const ExpedienteDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isInformeModalOpen, setIsInformeModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -667,6 +670,26 @@ export const ExpedienteDetail: React.FC = () => {
   const handleEditRequisito = (requisito: RequisitoData) => {
     // TODO: Implement edit functionality
     console.log('Edit requisito:', requisito);
+    setHasChanges(true);
+  };
+
+  const handleEditModeToggle = (newEditMode: boolean) => {
+    setEditMode(newEditMode);
+    if (!newEditMode) {
+      setHasChanges(false);
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    // TODO: Implement save functionality
+    console.log('Saving changes...');
+    // Simulate API call
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        setHasChanges(false);
+        resolve();
+      }, 1000);
+    });
   };
 
   return (
@@ -822,6 +845,15 @@ export const ExpedienteDetail: React.FC = () => {
       <RequisitosTabs 
         tabs={expediente.tabs}
         onEditRequisito={handleEditRequisito}
+      />
+
+      {/* Botones de Acción */}
+      <ActionButtons
+        expedienteId={id || ''}
+        onEditModeToggle={handleEditModeToggle}
+        onSaveChanges={handleSaveChanges}
+        editMode={editMode}
+        hasChanges={hasChanges}
       />
 
       {/* Modal de Informe Completo */}
