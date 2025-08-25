@@ -4,11 +4,16 @@ import { Home } from './pages/Home';
 import { Dashboard } from './pages/Dashboard';
 import { ExpedienteDetail } from './pages/ExpedienteDetail';
 import { ResolucionList } from './pages/ResolucionList';
+import { Login } from './pages/Login';
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Authentication Routes */}
+        <Route path="/login" element={<Login />} />
+        
+        {/* Main Application Routes */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="dashboard" element={<Dashboard />} />
@@ -17,9 +22,6 @@ function App() {
         </Route>
       </Routes>
     </Router>
-    // <div>
-    //   ga
-    // </div>
   );
 }
 

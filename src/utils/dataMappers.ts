@@ -159,7 +159,7 @@ export const mapExpedienteDetailData = (backendData: BackendExpedienteResponse):
 /**
  * Validates that the backend response has the required fields
  */
-export const validateBackendResponse = (data: any): data is BackendExpedienteResponse => {
+export const validateBackendResponse = (data: unknown): data is BackendExpedienteResponse => {
   if (!data || typeof data !== 'object') {
     return false;
   }

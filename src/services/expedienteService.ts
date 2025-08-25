@@ -30,7 +30,7 @@ export interface SaveRequisitoRequest {
 export interface SaveRequisitoResponse {
   success: boolean;
   message: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 class ExpedienteService {
