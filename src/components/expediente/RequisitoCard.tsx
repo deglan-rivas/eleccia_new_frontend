@@ -30,8 +30,40 @@ export const RequisitoCard: React.FC<RequisitoCardProps> = ({ requisito, onEdit,
     }
   };
 
+  // Get color classes based on estado_color
+  const getColorClasses = () => {
+    switch (requisito.estado_color) {
+      case 'green':
+        return {
+          background: 'bg-green-50 border-green-200',
+          badge: 'bg-green-100 text-green-800',
+          observation: 'bg-green-100 text-green-800'
+        };
+      case 'red':
+        return {
+          background: 'bg-red-50 border-red-200',
+          badge: 'bg-red-100 text-red-800',
+          observation: 'bg-red-100 text-red-800'
+        };
+      case 'yellow':
+        return {
+          background: 'bg-yellow-50 border-yellow-200',
+          badge: 'bg-yellow-100 text-yellow-800',
+          observation: 'bg-yellow-100 text-yellow-800'
+        };
+      default:
+        return {
+          background: 'bg-gray-50 border-gray-200',
+          badge: 'bg-gray-100 text-gray-800',
+          observation: 'bg-gray-100 text-gray-800'
+        };
+    }
+  };
+
+  const colorClasses = getColorClasses();
+
   return (
-    <div className={`border rounded-lg p-4 bg-${requisito.estado_color}-50`}>
+    <div className={`border rounded-lg p-4 ${colorClasses.background}`}>
       <div className="flex items-start">
         <div className="flex-shrink-0 mt-0.5">
           {getIcon()}
@@ -39,14 +71,14 @@ export const RequisitoCard: React.FC<RequisitoCardProps> = ({ requisito, onEdit,
         <div className="ml-3 flex-1">
           <div className="flex justify-between">
             <h5 className="text-sm font-medium text-gray-800">{requisito.nombre}</h5>
-            <span className={`text-xs bg-${requisito.estado_color}-100 text-${requisito.estado_color}-800 px-2 py-1 rounded-full`}>
+            <span className={`text-xs px-2 py-1 rounded-full ${colorClasses.badge}`}>
               {requisito.estado_texto}
             </span>
           </div>
           <p className="text-xs text-gray-600 mt-1">{requisito.descripcion}</p>
           
           {requisito.observacion && (
-            <div className={`mt-2 bg-${requisito.estado_color}-100 p-2 rounded text-xs text-${requisito.estado_color}-800`}>
+            <div className={`mt-2 p-2 rounded text-xs ${colorClasses.observation}`}>
               <p><strong>Observación:</strong> <span dangerouslySetInnerHTML={{ __html: requisito.observacion }} /></p>
             </div>
           )}

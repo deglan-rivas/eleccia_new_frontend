@@ -39,6 +39,20 @@
   }
 }
 
+/* Force Tailwind to include color classes */
+@layer components {
+  .requisito-colors {
+    /* Green colors */
+    @apply bg-green-50 bg-green-100 text-green-800 border-green-200;
+    /* Red colors */
+    @apply bg-red-50 bg-red-100 text-red-800 border-red-200;
+    /* Yellow colors */  
+    @apply bg-yellow-50 bg-yellow-100 text-yellow-800 border-yellow-200;
+    /* Gray colors */
+    @apply bg-gray-50 bg-gray-100 text-gray-800 border-gray-200;
+  }
+}
+
 /* Additional custom styles */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
@@ -46,4 +60,9 @@ body {
 
 .container {
   @apply mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Modal backdrop transparency fix */
+.modal-backdrop {
+  background-color: rgba(75, 85, 99, 0.5) !important;
 }
