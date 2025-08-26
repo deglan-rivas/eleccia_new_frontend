@@ -32,7 +32,7 @@ export const Select: React.FC<SelectProps> = ({
 }) => {
   const selectClasses = `w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-jne-red focus:border-jne-red outline-none transition-colors ${
     error ? 'border-red-500' : 'border-gray-300'
-  } ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''} ${className}`;
+  } ${disabled ? 'bg-gray-200 text-gray-600 cursor-not-allowed' : ''} ${className}`;
 
   return (
     <div className="space-y-1">

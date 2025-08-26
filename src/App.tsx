@@ -5,6 +5,7 @@ import { Dashboard } from './pages/Dashboard';
 import { ExpedienteDetail } from './pages/ExpedienteDetail';
 import { ResolucionList } from './pages/ResolucionList';
 import { Login } from './pages/Login';
+import { ParametrosRequisitos } from './pages/ParametrosRequisitos';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="expediente/:id" element={<ExpedienteDetail />} />
           <Route path="resoluciones/:expedienteId" element={<ResolucionList />} />
+          <Route path="parametros-requisitos" element={<ParametrosRequisitos />} />
         </Route>
       </Routes>
     </Router>
