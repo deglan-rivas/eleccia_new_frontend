@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Select } from '../components/ui/Select';
+import { Input } from '../components/ui/Input';
+import { RadioGroup } from '../components/forms/RadioGroup';
+import { Button } from '../components/ui/Button';
 import { 
   ANOS_DISPONIBLES, 
   TIPOS_PROCESO_ELECTORAL, 
   TIPOS_ELECCION, 
   TIPOS_EXPEDIENTE, 
-  TIPOS_MATERIA 
+  TIPOS_MATERIA,
+  REQUISITOS_ESPECIFICOS,
+  PARAMETROS_MOCK,
+  TIPOS_VALIDACION,
+  UNIDADES_MEDIDA,
+  type ParametroEvaluacion
 } from '../constants/parametros';
 import { type SelectOption } from '../types';
 
@@ -16,7 +24,10 @@ interface ContextoSeleccion {
   tipoEleccion: string;
   tipoExpediente: string;
   tipoMateria: string;
+  requisitoEspecifico: string;
 }
+
+type ParametrosFormulario = ParametroEvaluacion;
 
 export const ParametrosRequisitos: React.FC = () => {
   const [contexto, setContexto] = useState<ContextoSeleccion>({
@@ -24,7 +35,20 @@ export const ParametrosRequisitos: React.FC = () => {
     tipoProcesoElectoral: '',
     tipoEleccion: '',
     tipoExpediente: '',
-    tipoMateria: ''
+    tipoMateria: '',
+    requisitoEspecifico: ''
+  });
+
+  const [parametros, setParametros] = useState<ParametrosFormulario>({
+    nombreParametro: '',
+    tipoValidacion: '',
+    valorMinimo: '',
+    valorMaximo: '',
+    unidadMedida: '',
+    tolerancia: '',
+    aplicaExcepcion: false,
+    descripcionExcepcion: '',
+    nombreCriterio: 'cuerpo_lista'
   });
 
   const [opcionesDisponibles, setOpcionesDisponibles] = useState<{
@@ -32,12 +56,16 @@ export const ParametrosRequisitos: React.FC = () => {
     tiposEleccion: SelectOption[];
     tiposExpediente: SelectOption[];
     tiposMateria: SelectOption[];
+    requisitosEspecificos: SelectOption[];
   }>({
     tiposProcesoElectoral: [],
     tiposEleccion: [],
     tiposExpediente: [],
-    tiposMateria: []
+    tiposMateria: [],
+    requisitosEspecificos: []
   });
+
+  const [isSaving, setIsSaving] = useState(false);
 
   // Efecto para actualizar las opciones de Tipo de Proceso Electoral cuando cambia el año
   useEffect(() => {
@@ -54,7 +82,8 @@ export const ParametrosRequisitos: React.FC = () => {
         tipoProcesoElectoral: '',
         tipoEleccion: '',
         tipoExpediente: '',
-        tipoMateria: ''
+        tipoMateria: '',
+        requisitoEspecifico: ''
       }));
     } else {
       setOpcionesDisponibles(prev => ({
@@ -62,7 +91,8 @@ export const ParametrosRequisitos: React.FC = () => {
         tiposProcesoElectoral: [],
         tiposEleccion: [],
         tiposExpediente: [],
-        tiposMateria: []
+        tiposMateria: [],
+        requisitosEspecificos: []
       }));
     }
   }, [contexto.ano]);
@@ -81,14 +111,16 @@ export const ParametrosRequisitos: React.FC = () => {
         ...prev,
         tipoEleccion: '',
         tipoExpediente: '',
-        tipoMateria: ''
+        tipoMateria: '',
+        requisitoEspecifico: ''
       }));
     } else {
       setOpcionesDisponibles(prev => ({
         ...prev,
         tiposEleccion: [],
         tiposExpediente: [],
-        tiposMateria: []
+        tiposMateria: [],
+        requisitosEspecificos: []
       }));
     }
   }, [contexto.tipoProcesoElectoral]);
@@ -106,13 +138,15 @@ export const ParametrosRequisitos: React.FC = () => {
       setContexto(prev => ({
         ...prev,
         tipoExpediente: '',
-        tipoMateria: ''
+        tipoMateria: '',
+        requisitoEspecifico: ''
       }));
     } else {
       setOpcionesDisponibles(prev => ({
         ...prev,
         tiposExpediente: [],
-        tiposMateria: []
+        tiposMateria: [],
+        requisitosEspecificos: []
       }));
     }
   }, [contexto.tipoEleccion]);
@@ -129,23 +163,124 @@ export const ParametrosRequisitos: React.FC = () => {
       // Limpiar selección dependiente
       setContexto(prev => ({
         ...prev,
-        tipoMateria: ''
+        tipoMateria: '',
+        requisitoEspecifico: ''
       }));
     } else {
       setOpcionesDisponibles(prev => ({
         ...prev,
-        tiposMateria: []
+        tiposMateria: [],
+        requisitosEspecificos: []
       }));
     }
   }, [contexto.tipoExpediente]);
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  // Efecto para actualizar requisitos específicos cuando cambia el tipo de materia
+  useEffect(() => {
+    if (contexto.tipoMateria) {
+      const nuevasOpciones = REQUISITOS_ESPECIFICOS[contexto.tipoMateria] || [];
+      setOpcionesDisponibles(prev => ({
+        ...prev,
+        requisitosEspecificos: nuevasOpciones
+      }));
+      
+      // Limpiar selección dependiente
+      setContexto(prev => ({
+        ...prev,
+        requisitoEspecifico: ''
+      }));
+    } else {
+      setOpcionesDisponibles(prev => ({
+        ...prev,
+        requisitosEspecificos: []
+      }));
+    }
+  }, [contexto.tipoMateria]);
+
+  // Efecto para autocompletar parámetros cuando se selecciona un requisito específico
+  useEffect(() => {
+    if (contexto.requisitoEspecifico && PARAMETROS_MOCK[contexto.requisitoEspecifico]) {
+      const parametrosMock = PARAMETROS_MOCK[contexto.requisitoEspecifico];
+      setParametros(parametrosMock);
+    } else {
+      // Limpiar formulario si no hay requisito seleccionado
+      setParametros({
+        nombreParametro: '',
+        tipoValidacion: '',
+        valorMinimo: '',
+        valorMaximo: '',
+        unidadMedida: '',
+        tolerancia: '',
+        aplicaExcepcion: false,
+        descripcionExcepcion: '',
+        nombreCriterio: 'cuerpo_lista'
+      });
+    }
+  }, [contexto.requisitoEspecifico]);
+
+  const handleContextoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
     setContexto(prev => ({
       ...prev,
       [name]: value
     }));
   };
+
+  const handleParametroChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    setParametros(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    }));
+  };
+
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setParametros(prev => ({
+      ...prev,
+      [name]: value as 'cuerpo_lista' | 'lista_completa'
+    }));
+  };
+
+  const isFormValid = () => {
+    return (
+      contexto.requisitoEspecifico &&
+      parametros.nombreParametro.trim() &&
+      parametros.tipoValidacion.trim() &&
+      parametros.valorMinimo.trim() &&
+      parametros.valorMaximo.trim() &&
+      parametros.unidadMedida.trim()
+    );
+  };
+
+  const handleSaveConfiguration = async () => {
+    if (!isFormValid()) return;
+    
+    setIsSaving(true);
+    try {
+      // Simular guardado
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Aquí iría la llamada real al backend
+      console.log('Configuración guardada:', { contexto, parametros });
+      
+      // Mostrar mensaje de éxito (se podría usar un toast)
+      alert('Configuración guardada exitosamente');
+    } catch (error) {
+      console.error('Error al guardar:', error);
+      alert('Error al guardar la configuración');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const radioOptions = [
+    { value: 'cuerpo_lista', label: 'Cuerpo de Lista' },
+    { value: 'lista_completa', label: 'Lista Completa' }
+  ];
+
+  const showBloque2 = Boolean(contexto.tipoMateria);
+  const showRestoBloques = Boolean(contexto.requisitoEspecifico);
 
   return (
     <div className="space-y-6">
@@ -180,7 +315,7 @@ export const ParametrosRequisitos: React.FC = () => {
               label="Año"
               name="ano"
               value={contexto.ano}
-              onChange={handleSelectChange}
+              onChange={handleContextoChange}
               options={ANOS_DISPONIBLES}
               placeholder="Seleccione el año"
               required
@@ -191,7 +326,7 @@ export const ParametrosRequisitos: React.FC = () => {
               label="Tipo de Proceso Electoral"
               name="tipoProcesoElectoral"
               value={contexto.tipoProcesoElectoral}
-              onChange={handleSelectChange}
+              onChange={handleContextoChange}
               options={opcionesDisponibles.tiposProcesoElectoral}
               placeholder="Seleccione el proceso"
               disabled={!contexto.ano}
@@ -203,7 +338,7 @@ export const ParametrosRequisitos: React.FC = () => {
               label="Tipo de Elección"
               name="tipoEleccion"
               value={contexto.tipoEleccion}
-              onChange={handleSelectChange}
+              onChange={handleContextoChange}
               options={opcionesDisponibles.tiposEleccion}
               placeholder="Seleccione el tipo"
               disabled={!contexto.tipoProcesoElectoral}
@@ -215,7 +350,7 @@ export const ParametrosRequisitos: React.FC = () => {
               label="Tipo de Expediente"
               name="tipoExpediente"
               value={contexto.tipoExpediente}
-              onChange={handleSelectChange}
+              onChange={handleContextoChange}
               options={opcionesDisponibles.tiposExpediente}
               placeholder="Seleccione el expediente"
               disabled={!contexto.tipoEleccion}
@@ -227,7 +362,7 @@ export const ParametrosRequisitos: React.FC = () => {
               label="Tipo de Materia"
               name="tipoMateria"
               value={contexto.tipoMateria}
-              onChange={handleSelectChange}
+              onChange={handleContextoChange}
               options={opcionesDisponibles.tiposMateria}
               placeholder="Seleccione la materia"
               disabled={!contexto.tipoExpediente}
@@ -236,58 +371,203 @@ export const ParametrosRequisitos: React.FC = () => {
           </div>
         </div>
 
-        {/* Bloques siguientes - por implementar */}
-        <div className="space-y-8">
-          {/* Bloque 2: Selección del requisito */}
-          <div className="border-t pt-8">
+        {/* Bloque 2: Selección del requisito */}
+        {showBloque2 && (
+          <div className="mb-8 border-t pt-8">
             <div className="flex items-center mb-6">
-              <div className="flex items-center justify-center w-8 h-8 bg-gray-300 text-gray-500 rounded-full mr-3">
+              <div className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full mr-3">
                 <span className="text-sm font-bold">2</span>
               </div>
-              <h2 className="text-xl font-semibold text-gray-400">Selección del requisito</h2>
+              <h2 className="text-xl font-semibold text-gray-800">Selección del requisito</h2>
             </div>
+
             <div className="ml-11">
-              <p className="text-gray-400 italic">
-                Este bloque se habilitará una vez completada la selección de contexto
-              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Requisito Específico - A la izquierda */}
+                <Select
+                  label="Requisito Específico"
+                  name="requisitoEspecifico"
+                  value={contexto.requisitoEspecifico}
+                  onChange={handleContextoChange}
+                  options={opcionesDisponibles.requisitosEspecificos}
+                  placeholder="Seleccione el requisito específico"
+                  required
+                />
+                
+                {/* Resto del bloque 2 - Solo se muestra si hay requisito seleccionado */}
+                {showRestoBloques && (
+                  <div className="space-y-4">
+                    <Input
+                      label="Nombre del parámetro"
+                      name="nombreParametro"
+                      value={parametros.nombreParametro}
+                      onChange={handleParametroChange}
+                      placeholder="Nombre descriptivo del parámetro"
+                      required
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+        )}
 
-          {/* Bloque 3: Parámetros de evaluación */}
+        {/* Bloque 3: Parámetros de evaluación */}
+        {showRestoBloques && (
           <div className="border-t pt-8">
             <div className="flex items-center mb-6">
-              <div className="flex items-center justify-center w-8 h-8 bg-gray-300 text-gray-500 rounded-full mr-3">
+              <div className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full mr-3">
                 <span className="text-sm font-bold">3</span>
               </div>
-              <h2 className="text-xl font-semibold text-gray-400">Parámetros de evaluación</h2>
+              <h2 className="text-xl font-semibold text-gray-800">Parámetros de evaluación</h2>
             </div>
+            
             <div className="ml-11">
-              <p className="text-gray-400 italic">
-                Este bloque se habilitará una vez seleccionado el requisito específico
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Tipo de validación */}
+                <Select
+                  label="Tipo de validación"
+                  name="tipoValidacion"
+                  value={parametros.tipoValidacion}
+                  onChange={handleParametroChange}
+                  options={TIPOS_VALIDACION}
+                  placeholder="Seleccione el tipo"
+                  required
+                />
 
-      {/* Progress indicator */}
-      {/* {contexto.ano && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <svg className="h-5 w-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-            <div className="text-sm text-blue-800">
-              <strong>Contexto seleccionado:</strong>
-              {contexto.ano && ` Año: ${contexto.ano}`}
-              {contexto.tipoProcesoElectoral && ` | Proceso: ${TIPOS_PROCESO_ELECTORAL[contexto.ano]?.find(p => p.value === contexto.tipoProcesoElectoral)?.label}`}
-              {contexto.tipoEleccion && ` | Elección: ${TIPOS_ELECCION[contexto.tipoProcesoElectoral]?.find(e => e.value === contexto.tipoEleccion)?.label}`}
-              {contexto.tipoExpediente && ` | Expediente: ${TIPOS_EXPEDIENTE[contexto.tipoEleccion]?.find(exp => exp.value === contexto.tipoExpediente)?.label}`}
-              {contexto.tipoMateria && ` | Materia: ${TIPOS_MATERIA[contexto.tipoExpediente]?.find(m => m.value === contexto.tipoMateria)?.label}`}
+                {/* Valor mínimo */}
+                <Input
+                  label="Valor mínimo"
+                  name="valorMinimo"
+                  type="number"
+                  value={parametros.valorMinimo}
+                  onChange={handleParametroChange}
+                  placeholder="0"
+                  required
+                />
+
+                {/* Valor máximo */}
+                <Input
+                  label="Valor máximo"
+                  name="valorMaximo"
+                  type="number"
+                  value={parametros.valorMaximo}
+                  onChange={handleParametroChange}
+                  placeholder="100"
+                  required
+                />
+
+                {/* Unidad de medida */}
+                <Select
+                  label="Unidad de medida"
+                  name="unidadMedida"
+                  value={parametros.unidadMedida}
+                  onChange={handleParametroChange}
+                  options={UNIDADES_MEDIDA}
+                  placeholder="Seleccione unidad"
+                  required
+                />
+
+                {/* Tolerancia */}
+                <Input
+                  label="Tolerancia"
+                  name="tolerancia"
+                  type="number"
+                  value={parametros.tolerancia}
+                  onChange={handleParametroChange}
+                  placeholder="0"
+                />
+
+                {/* Aplica excepción */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    ¿Aplica excepción?
+                  </label>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="aplicaExcepcion"
+                      checked={parametros.aplicaExcepcion}
+                      onChange={handleParametroChange}
+                      className="h-4 w-4 text-jne-red focus:ring-jne-red border-gray-300 rounded"
+                    />
+                    <label className="ml-2 text-sm text-gray-700">Sí, aplica excepción</label>
+                  </div>
+                </div>
+
+                {/* Descripción de excepción */}
+                {parametros.aplicaExcepcion && (
+                  <div className="md:col-span-2 lg:col-span-3">
+                    <Input
+                      label="Descripción de la excepción"
+                      name="descripcionExcepcion"
+                      value={parametros.descripcionExcepcion}
+                      onChange={handleParametroChange}
+                      placeholder="Describa cuándo aplica la excepción..."
+                    />
+                  </div>
+                )}
+
+                {/* Nombre del criterio - Radio buttons */}
+                <div className="md:col-span-2 lg:col-span-3">
+                  <RadioGroup
+                    name="nombreCriterio"
+                    value={parametros.nombreCriterio}
+                    onChange={handleRadioChange}
+                    options={radioOptions}
+                    label="Nombre del criterio"
+                    required
+                  />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )} */}
+        )}
+
+        {/* Botones de acción */}
+        {showRestoBloques && (
+          <div className="border-t pt-6 mt-8">
+            <div className="flex justify-end space-x-4">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  setContexto({
+                    ano: '',
+                    tipoProcesoElectoral: '',
+                    tipoEleccion: '',
+                    tipoExpediente: '',
+                    tipoMateria: '',
+                    requisitoEspecifico: ''
+                  });
+                  setParametros({
+                    nombreParametro: '',
+                    tipoValidacion: '',
+                    valorMinimo: '',
+                    valorMaximo: '',
+                    unidadMedida: '',
+                    tolerancia: '',
+                    aplicaExcepcion: false,
+                    descripcionExcepcion: '',
+                    nombreCriterio: 'cuerpo_lista'
+                  });
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                disabled={!isFormValid() || isSaving}
+                loading={isSaving}
+                onClick={handleSaveConfiguration}
+              >
+                Guardar Configuración
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

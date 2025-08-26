@@ -154,3 +154,142 @@ export const TIPOS_MATERIA: Record<string, SelectOption[]> = {
     { value: 'procedimiento_convocatoria', label: 'Procedimiento de Convocatoria' }
   ]
 };
+
+// Requisitos específicos por tipo de materia
+export const REQUISITOS_ESPECIFICOS: Record<string, SelectOption[]> = {
+  'conformacion_lista': [
+    { value: 'numero_candidatos', label: 'Número mínimo y máximo de candidatos' },
+    { value: 'orden_lista', label: 'Orden de candidatos en la lista' },
+    { value: 'alternancia_genero', label: 'Alternancia de género' }
+  ],
+  'requisitos_candidatos': [
+    { value: 'edad_minima', label: 'Edad mínima del candidato' },
+    { value: 'ciudadania', label: 'Ciudadanía peruana' },
+    { value: 'residencia', label: 'Residencia en la circunscripción' },
+    { value: 'antecedentes', label: 'Antecedentes penales y judiciales' }
+  ],
+  'cuota_genero': [
+    { value: 'porcentaje_mujeres', label: 'Porcentaje mínimo de mujeres' },
+    { value: 'posiciones_alternadas', label: 'Posiciones alternadas por género' },
+    { value: 'ubicacion_lista', label: 'Ubicación en posiciones expectantes' }
+  ],
+  'cuota_joven': [
+    { value: 'porcentaje_jovenes', label: 'Porcentaje mínimo de jóvenes' },
+    { value: 'edad_maxima', label: 'Edad máxima para cuota joven' },
+    { value: 'distribucion_lista', label: 'Distribución en la lista' }
+  ],
+  'requisitos_personales': [
+    { value: 'edad_minima', label: 'Edad mínima requerida' },
+    { value: 'nivel_educativo', label: 'Nivel educativo mínimo' },
+    { value: 'experiencia', label: 'Experiencia profesional o política' }
+  ],
+  'documentacion_partidaria': [
+    { value: 'acreditacion_partido', label: 'Acreditación del partido político' },
+    { value: 'designacion_candidatos', label: 'Designación de candidatos' },
+    { value: 'estatutos_vigentes', label: 'Estatutos vigentes del partido' }
+  ]
+};
+
+// Parámetros mock para evaluación de requisitos
+export interface ParametroEvaluacion {
+  nombreParametro: string;
+  tipoValidacion: string;
+  valorMinimo: string;
+  valorMaximo: string;
+  unidadMedida: string;
+  tolerancia: string;
+  aplicaExcepcion: boolean;
+  descripcionExcepcion: string;
+  nombreCriterio: 'cuerpo_lista' | 'lista_completa';
+}
+
+export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
+  'porcentaje_mujeres': {
+    nombreParametro: 'Porcentaje mínimo de mujeres en la lista',
+    tipoValidacion: 'Porcentaje',
+    valorMinimo: '30',
+    valorMaximo: '100',
+    unidadMedida: '%',
+    tolerancia: '5',
+    aplicaExcepcion: true,
+    descripcionExcepcion: 'Se aplica excepción para listas con menos de 5 candidatos',
+    nombreCriterio: 'lista_completa'
+  },
+  'edad_minima': {
+    nombreParametro: 'Edad mínima del candidato',
+    tipoValidacion: 'Numérico',
+    valorMinimo: '25',
+    valorMaximo: '100',
+    unidadMedida: 'años',
+    tolerancia: '0',
+    aplicaExcepcion: false,
+    descripcionExcepcion: '',
+    nombreCriterio: 'cuerpo_lista'
+  },
+  'numero_candidatos': {
+    nombreParametro: 'Número de candidatos en la lista',
+    tipoValidacion: 'Rango',
+    valorMinimo: '1',
+    valorMaximo: '130',
+    unidadMedida: 'candidatos',
+    tolerancia: '0',
+    aplicaExcepcion: false,
+    descripcionExcepcion: '',
+    nombreCriterio: 'lista_completa'
+  },
+  'porcentaje_jovenes': {
+    nombreParametro: 'Porcentaje mínimo de jóvenes',
+    tipoValidacion: 'Porcentaje',
+    valorMinimo: '20',
+    valorMaximo: '100',
+    unidadMedida: '%',
+    tolerancia: '3',
+    aplicaExcepcion: true,
+    descripcionExcepcion: 'Aplica para listas de más de 10 candidatos',
+    nombreCriterio: 'lista_completa'
+  },
+  'ciudadania': {
+    nombreParametro: 'Verificación de ciudadanía peruana',
+    tipoValidacion: 'Booleano',
+    valorMinimo: '1',
+    valorMaximo: '1',
+    unidadMedida: 'sí/no',
+    tolerancia: '0',
+    aplicaExcepcion: false,
+    descripcionExcepcion: '',
+    nombreCriterio: 'cuerpo_lista'
+  },
+  'alternancia_genero': {
+    nombreParametro: 'Alternancia de género en la lista',
+    tipoValidacion: 'Patrón',
+    valorMinimo: '1',
+    valorMaximo: '1',
+    unidadMedida: 'patrón',
+    tolerancia: '0',
+    aplicaExcepcion: true,
+    descripcionExcepcion: 'Se permite excepción en el último tercio de la lista',
+    nombreCriterio: 'lista_completa'
+  }
+};
+
+// Tipos de validación disponibles
+export const TIPOS_VALIDACION: SelectOption[] = [
+  { value: 'Porcentaje', label: 'Porcentaje' },
+  { value: 'Numérico', label: 'Numérico' },
+  { value: 'Rango', label: 'Rango' },
+  { value: 'Booleano', label: 'Booleano' },
+  { value: 'Patrón', label: 'Patrón' },
+  { value: 'Texto', label: 'Texto' }
+];
+
+// Unidades de medida
+export const UNIDADES_MEDIDA: SelectOption[] = [
+  { value: '%', label: '%' },
+  { value: 'años', label: 'años' },
+  { value: 'candidatos', label: 'candidatos' },
+  { value: 'sí/no', label: 'sí/no' },
+  { value: 'patrón', label: 'patrón' },
+  { value: 'texto', label: 'texto' },
+  { value: 'días', label: 'días' },
+  { value: 'cantidad', label: 'cantidad' }
+];
