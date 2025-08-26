@@ -221,6 +221,7 @@ export interface ParametroIndividual {
   max?: number; // Para inputs numéricos
 }
 
+// Esta variable es mutable para simular actualizaciones del backend
 export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
   'porcentaje_mujeres': {
     categoriaRequisito: 'requisitos_lista',
@@ -445,3 +446,18 @@ export const UNIDADES_MEDIDA: SelectOption[] = [
   { value: 'días', label: 'días' },
   { value: 'cantidad', label: 'cantidad' }
 ];
+
+// Función para actualizar parámetros mock (simula actualización del backend)
+export const updateParametrosMock = (
+  requisitoId: string, 
+  parametrosActualizados: ParametroEvaluacion
+): void => {
+  if (PARAMETROS_MOCK[requisitoId]) {
+    PARAMETROS_MOCK[requisitoId] = { ...parametrosActualizados };
+  }
+};
+
+// Función para obtener parámetros mock (simula consulta al backend)
+export const getParametrosMock = (requisitoId: string): ParametroEvaluacion | null => {
+  return PARAMETROS_MOCK[requisitoId] || null;
+};

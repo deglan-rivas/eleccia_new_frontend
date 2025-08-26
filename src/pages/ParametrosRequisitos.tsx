@@ -3,6 +3,8 @@ import { Select } from '../components/ui/Select';
 import { Input } from '../components/ui/Input';
 import { RadioGroup } from '../components/forms/RadioGroup';
 import { Button } from '../components/ui/Button';
+import { Toast } from '../components/ui/Toast';
+import { useToast } from '../hooks/useToast';
 import { 
   ANOS_DISPONIBLES, 
   TIPOS_PROCESO_ELECTORAL, 
@@ -13,6 +15,7 @@ import {
   PARAMETROS_MOCK,
   CATEGORIAS_REQUISITO,
   OPCIONES_OBLIGATORIEDAD,
+  updateParametrosMock,
   type ParametroEvaluacion,
   type ParametroIndividual
 } from '../constants/parametros';
@@ -65,6 +68,7 @@ export const ParametrosRequisitos: React.FC = () => {
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const { toast, showSuccess, showError, hideToast } = useToast();
 
   // Efectos para la cascada de selección (mismo código anterior)
   useEffect(() => {
@@ -279,13 +283,38 @@ export const ParametrosRequisitos: React.FC = () => {
     
     setIsSaving(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simular delay de red
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      console.log('Configuración guardada:', { contexto, parametros });
-      alert('Configuración guardada exitosamente');
+      // Actualizar los parámetros con los valores del formulario
+      const parametrosActualizados: ParametroEvaluacion = {
+        categoriaRequisito: parametros.categoriaRequisito,
+        descripcionRequisito: parametros.descripcionRequisito,
+        obligatoriedad: parametros.obligatoriedad,
+        nombreCriterio: parametros.nombreCriterio,
+        parametros: parametros.parametros.map(param => ({
+          ...param,
+          valor: parametros.parametrosValues[param.nombre] || param.valor
+        }))
+      };
+      
+      // Guardar en el mockup (simula actualización del backend)
+      updateParametrosMock(contexto.requisitoEspecifico, parametrosActualizados);
+      
+      console.log('✅ Configuración guardada exitosamente:', {
+        requisito: contexto.requisitoEspecifico,
+        contexto: contexto,
+        parametros: parametrosActualizados
+      });
+      
+      // Mostrar mensaje de éxito con Toast
+      showSuccess(
+        `Configuración guardada exitosamente para el requisito "${REQUISITOS_ESPECIFICOS[contexto.tipoMateria]?.find(r => r.value === contexto.requisitoEspecifico)?.label}"`
+      );
+      
     } catch (error) {
-      console.error('Error al guardar:', error);
-      alert('Error al guardar la configuración');
+      console.error('❌ Error al guardar la configuración:', error);
+      showError('Error al guardar la configuración. Por favor, inténtalo de nuevo.');
     } finally {
       setIsSaving(false);
     }
@@ -565,6 +594,15 @@ export const ParametrosRequisitos: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {/* Toast para notificaciones */}
+      <Toast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={hideToast}
+        duration={4000}
+      />
     </div>
   );
 };
