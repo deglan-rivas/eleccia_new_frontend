@@ -190,85 +190,237 @@ export const REQUISITOS_ESPECIFICOS: Record<string, SelectOption[]> = {
   ]
 };
 
+// Categorías de requisito
+export const CATEGORIAS_REQUISITO: SelectOption[] = [
+  { value: 'requisitos_lista', label: 'Requisitos de Lista' },
+  { value: 'requisitos_candidato', label: 'Requisitos de Candidato' }
+];
+
+// Opciones de obligatoriedad
+export const OPCIONES_OBLIGATORIEDAD = [
+  { value: 'obligatorio', label: 'Obligatorio' },
+  { value: 'opcional', label: 'Opcional' }
+];
+
 // Parámetros mock para evaluación de requisitos
 export interface ParametroEvaluacion {
-  nombreParametro: string;
-  tipoValidacion: string;
-  valorMinimo: string;
-  valorMaximo: string;
-  unidadMedida: string;
-  tolerancia: string;
-  aplicaExcepcion: boolean;
-  descripcionExcepcion: string;
+  categoriaRequisito: string;
+  descripcionRequisito: string;
+  obligatoriedad: 'obligatorio' | 'opcional';
   nombreCriterio: 'cuerpo_lista' | 'lista_completa';
+  parametros: ParametroIndividual[];
+}
+
+export interface ParametroIndividual {
+  nombre: string;
+  unidad: string;
+  tipo: 'number' | 'select' | 'radio';
+  valor: string | number;
+  opciones?: SelectOption[]; // Para selects y radios
+  min?: number; // Para inputs numéricos
+  max?: number; // Para inputs numéricos
 }
 
 export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
   'porcentaje_mujeres': {
-    nombreParametro: 'Porcentaje mínimo de mujeres en la lista',
-    tipoValidacion: 'Porcentaje',
-    valorMinimo: '30',
-    valorMaximo: '100',
-    unidadMedida: '%',
-    tolerancia: '5',
-    aplicaExcepcion: true,
-    descripcionExcepcion: 'Se aplica excepción para listas con menos de 5 candidatos',
-    nombreCriterio: 'lista_completa'
+    categoriaRequisito: 'requisitos_lista',
+    descripcionRequisito: 'Evaluación del cumplimiento de cuota de género femenino en la conformación de la lista electoral',
+    obligatoriedad: 'obligatorio',
+    nombreCriterio: 'lista_completa',
+    parametros: [
+      {
+        nombre: 'Porcentaje mínimo',
+        unidad: '%',
+        tipo: 'number',
+        valor: 30,
+        min: 0,
+        max: 100
+      },
+      {
+        nombre: 'Tolerancia permitida',
+        unidad: '%',
+        tipo: 'number',
+        valor: 5,
+        min: 0,
+        max: 10
+      },
+      {
+        nombre: 'Aplica excepción',
+        unidad: 'sí/no',
+        tipo: 'radio',
+        valor: 'sí',
+        opciones: [
+          { value: 'sí', label: 'Sí' },
+          { value: 'no', label: 'No' }
+        ]
+      }
+    ]
   },
   'edad_minima': {
-    nombreParametro: 'Edad mínima del candidato',
-    tipoValidacion: 'Numérico',
-    valorMinimo: '25',
-    valorMaximo: '100',
-    unidadMedida: 'años',
-    tolerancia: '0',
-    aplicaExcepcion: false,
-    descripcionExcepcion: '',
-    nombreCriterio: 'cuerpo_lista'
+    categoriaRequisito: 'requisitos_candidato',
+    descripcionRequisito: 'Verificación de que todos los candidatos cumplan con la edad mínima establecida para el cargo',
+    obligatoriedad: 'obligatorio',
+    nombreCriterio: 'cuerpo_lista',
+    parametros: [
+      {
+        nombre: 'Edad mínima requerida',
+        unidad: 'años',
+        tipo: 'number',
+        valor: 25,
+        min: 18,
+        max: 100
+      },
+      {
+        nombre: 'Fecha de referencia',
+        unidad: 'momento',
+        tipo: 'select',
+        valor: 'inscripcion',
+        opciones: [
+          { value: 'inscripcion', label: 'Al momento de inscripción' },
+          { value: 'eleccion', label: 'Al día de la elección' },
+          { value: 'juramentacion', label: 'Al día de juramentación' }
+        ]
+      }
+    ]
   },
   'numero_candidatos': {
-    nombreParametro: 'Número de candidatos en la lista',
-    tipoValidacion: 'Rango',
-    valorMinimo: '1',
-    valorMaximo: '130',
-    unidadMedida: 'candidatos',
-    tolerancia: '0',
-    aplicaExcepcion: false,
-    descripcionExcepcion: '',
-    nombreCriterio: 'lista_completa'
+    categoriaRequisito: 'requisitos_lista',
+    descripcionRequisito: 'Control del número total de candidatos que debe contener la lista electoral según el tipo de elección',
+    obligatoriedad: 'obligatorio',
+    nombreCriterio: 'lista_completa',
+    parametros: [
+      {
+        nombre: 'Número mínimo',
+        unidad: 'candidatos',
+        tipo: 'number',
+        valor: 1,
+        min: 1,
+        max: 200
+      },
+      {
+        nombre: 'Número máximo',
+        unidad: 'candidatos',
+        tipo: 'number',
+        valor: 130,
+        min: 1,
+        max: 200
+      },
+      {
+        nombre: 'Incluir accesitarios',
+        unidad: 'sí/no',
+        tipo: 'radio',
+        valor: 'sí',
+        opciones: [
+          { value: 'sí', label: 'Sí' },
+          { value: 'no', label: 'No' }
+        ]
+      }
+    ]
   },
   'porcentaje_jovenes': {
-    nombreParametro: 'Porcentaje mínimo de jóvenes',
-    tipoValidacion: 'Porcentaje',
-    valorMinimo: '20',
-    valorMaximo: '100',
-    unidadMedida: '%',
-    tolerancia: '3',
-    aplicaExcepcion: true,
-    descripcionExcepcion: 'Aplica para listas de más de 10 candidatos',
-    nombreCriterio: 'lista_completa'
+    categoriaRequisito: 'requisitos_lista',
+    descripcionRequisito: 'Evaluación del cumplimiento de cuota joven en la conformación de la lista electoral',
+    obligatoriedad: 'obligatorio',
+    nombreCriterio: 'lista_completa',
+    parametros: [
+      {
+        nombre: 'Porcentaje mínimo',
+        unidad: '%',
+        tipo: 'number',
+        valor: 20,
+        min: 0,
+        max: 100
+      },
+      {
+        nombre: 'Edad máxima joven',
+        unidad: 'años',
+        tipo: 'number',
+        valor: 29,
+        min: 18,
+        max: 40
+      },
+      {
+        nombre: 'Aplica solo si',
+        unidad: 'candidatos mínimos',
+        tipo: 'select',
+        valor: '10',
+        opciones: [
+          { value: '5', label: 'Lista tiene más de 5 candidatos' },
+          { value: '10', label: 'Lista tiene más de 10 candidatos' },
+          { value: '15', label: 'Lista tiene más de 15 candidatos' }
+        ]
+      }
+    ]
   },
   'ciudadania': {
-    nombreParametro: 'Verificación de ciudadanía peruana',
-    tipoValidacion: 'Booleano',
-    valorMinimo: '1',
-    valorMaximo: '1',
-    unidadMedida: 'sí/no',
-    tolerancia: '0',
-    aplicaExcepcion: false,
-    descripcionExcepcion: '',
-    nombreCriterio: 'cuerpo_lista'
+    categoriaRequisito: 'requisitos_candidato',
+    descripcionRequisito: 'Verificación de ciudadanía peruana por nacimiento o naturalización de todos los candidatos',
+    obligatoriedad: 'obligatorio',
+    nombreCriterio: 'cuerpo_lista',
+    parametros: [
+      {
+        nombre: 'Tipo de ciudadanía',
+        unidad: 'modalidad',
+        tipo: 'select',
+        valor: 'ambas',
+        opciones: [
+          { value: 'nacimiento', label: 'Solo por nacimiento' },
+          { value: 'naturalizacion', label: 'Solo por naturalización' },
+          { value: 'ambas', label: 'Ambas modalidades' }
+        ]
+      },
+      {
+        nombre: 'Documento válido',
+        unidad: 'tipo',
+        tipo: 'select',
+        valor: 'dni',
+        opciones: [
+          { value: 'dni', label: 'DNI' },
+          { value: 'cedula', label: 'Cédula de identidad' },
+          { value: 'pasaporte', label: 'Pasaporte peruano' }
+        ]
+      }
+    ]
   },
   'alternancia_genero': {
-    nombreParametro: 'Alternancia de género en la lista',
-    tipoValidacion: 'Patrón',
-    valorMinimo: '1',
-    valorMaximo: '1',
-    unidadMedida: 'patrón',
-    tolerancia: '0',
-    aplicaExcepcion: true,
-    descripcionExcepcion: 'Se permite excepción en el último tercio de la lista',
-    nombreCriterio: 'lista_completa'
+    categoriaRequisito: 'requisitos_lista',
+    descripcionRequisito: 'Verificación del patrón de alternancia de género en la secuencia de candidatos de la lista',
+    obligatoriedad: 'obligatorio',
+    nombreCriterio: 'lista_completa',
+    parametros: [
+      {
+        nombre: 'Patrón requerido',
+        unidad: 'modalidad',
+        tipo: 'select',
+        valor: 'intercalado',
+        opciones: [
+          { value: 'intercalado', label: 'Intercalado (H-M-H-M...)' },
+          { value: 'bloques', label: 'Por bloques de 2' },
+          { value: 'bloques3', label: 'Por bloques de 3' }
+        ]
+      },
+      {
+        nombre: 'Excepción en último tercio',
+        unidad: 'sí/no',
+        tipo: 'radio',
+        valor: 'sí',
+        opciones: [
+          { value: 'sí', label: 'Sí' },
+          { value: 'no', label: 'No' }
+        ]
+      },
+      {
+        nombre: 'Inicio de patrón',
+        unidad: 'género',
+        tipo: 'select',
+        valor: 'cualquiera',
+        opciones: [
+          { value: 'masculino', label: 'Debe iniciar con hombre' },
+          { value: 'femenino', label: 'Debe iniciar con mujer' },
+          { value: 'cualquiera', label: 'Puede iniciar con cualquiera' }
+        ]
+      }
+    ]
   }
 };
 

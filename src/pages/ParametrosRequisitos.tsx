@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Select } from '../components/ui/Select';
 import { Input } from '../components/ui/Input';
 import { RadioGroup } from '../components/forms/RadioGroup';
@@ -12,9 +11,10 @@ import {
   TIPOS_MATERIA,
   REQUISITOS_ESPECIFICOS,
   PARAMETROS_MOCK,
-  TIPOS_VALIDACION,
-  UNIDADES_MEDIDA,
-  type ParametroEvaluacion
+  CATEGORIAS_REQUISITO,
+  OPCIONES_OBLIGATORIEDAD,
+  type ParametroEvaluacion,
+  type ParametroIndividual
 } from '../constants/parametros';
 import { type SelectOption } from '../types';
 
@@ -27,7 +27,9 @@ interface ContextoSeleccion {
   requisitoEspecifico: string;
 }
 
-type ParametrosFormulario = ParametroEvaluacion;
+interface ParametrosFormulario extends ParametroEvaluacion {
+  parametrosValues: Record<string, string | number>;
+}
 
 export const ParametrosRequisitos: React.FC = () => {
   const [contexto, setContexto] = useState<ContextoSeleccion>({
@@ -40,15 +42,12 @@ export const ParametrosRequisitos: React.FC = () => {
   });
 
   const [parametros, setParametros] = useState<ParametrosFormulario>({
-    nombreParametro: '',
-    tipoValidacion: '',
-    valorMinimo: '',
-    valorMaximo: '',
-    unidadMedida: '',
-    tolerancia: '',
-    aplicaExcepcion: false,
-    descripcionExcepcion: '',
-    nombreCriterio: 'cuerpo_lista'
+    categoriaRequisito: '',
+    descripcionRequisito: '',
+    obligatoriedad: 'obligatorio',
+    nombreCriterio: 'cuerpo_lista',
+    parametros: [],
+    parametrosValues: {}
   });
 
   const [opcionesDisponibles, setOpcionesDisponibles] = useState<{
@@ -67,7 +66,7 @@ export const ParametrosRequisitos: React.FC = () => {
 
   const [isSaving, setIsSaving] = useState(false);
 
-  // Efecto para actualizar las opciones de Tipo de Proceso Electoral cuando cambia el año
+  // Efectos para la cascada de selección (mismo código anterior)
   useEffect(() => {
     if (contexto.ano) {
       const nuevasOpciones = TIPOS_PROCESO_ELECTORAL[contexto.ano] || [];
@@ -76,7 +75,6 @@ export const ParametrosRequisitos: React.FC = () => {
         tiposProcesoElectoral: nuevasOpciones
       }));
       
-      // Limpiar selecciones dependientes
       setContexto(prev => ({
         ...prev,
         tipoProcesoElectoral: '',
@@ -97,7 +95,6 @@ export const ParametrosRequisitos: React.FC = () => {
     }
   }, [contexto.ano]);
 
-  // Efecto para actualizar las opciones de Tipo de Elección cuando cambia el tipo de proceso
   useEffect(() => {
     if (contexto.tipoProcesoElectoral) {
       const nuevasOpciones = TIPOS_ELECCION[contexto.tipoProcesoElectoral] || [];
@@ -106,7 +103,6 @@ export const ParametrosRequisitos: React.FC = () => {
         tiposEleccion: nuevasOpciones
       }));
       
-      // Limpiar selecciones dependientes
       setContexto(prev => ({
         ...prev,
         tipoEleccion: '',
@@ -125,7 +121,6 @@ export const ParametrosRequisitos: React.FC = () => {
     }
   }, [contexto.tipoProcesoElectoral]);
 
-  // Efecto para actualizar las opciones de Tipo de Expediente cuando cambia el tipo de elección
   useEffect(() => {
     if (contexto.tipoEleccion) {
       const nuevasOpciones = TIPOS_EXPEDIENTE[contexto.tipoEleccion] || [];
@@ -134,7 +129,6 @@ export const ParametrosRequisitos: React.FC = () => {
         tiposExpediente: nuevasOpciones
       }));
       
-      // Limpiar selecciones dependientes
       setContexto(prev => ({
         ...prev,
         tipoExpediente: '',
@@ -151,7 +145,6 @@ export const ParametrosRequisitos: React.FC = () => {
     }
   }, [contexto.tipoEleccion]);
 
-  // Efecto para actualizar las opciones de Tipo de Materia cuando cambia el tipo de expediente
   useEffect(() => {
     if (contexto.tipoExpediente) {
       const nuevasOpciones = TIPOS_MATERIA[contexto.tipoExpediente] || [];
@@ -160,7 +153,6 @@ export const ParametrosRequisitos: React.FC = () => {
         tiposMateria: nuevasOpciones
       }));
       
-      // Limpiar selección dependiente
       setContexto(prev => ({
         ...prev,
         tipoMateria: '',
@@ -175,7 +167,6 @@ export const ParametrosRequisitos: React.FC = () => {
     }
   }, [contexto.tipoExpediente]);
 
-  // Efecto para actualizar requisitos específicos cuando cambia el tipo de materia
   useEffect(() => {
     if (contexto.tipoMateria) {
       const nuevasOpciones = REQUISITOS_ESPECIFICOS[contexto.tipoMateria] || [];
@@ -184,7 +175,6 @@ export const ParametrosRequisitos: React.FC = () => {
         requisitosEspecificos: nuevasOpciones
       }));
       
-      // Limpiar selección dependiente
       setContexto(prev => ({
         ...prev,
         requisitoEspecifico: ''
@@ -201,19 +191,25 @@ export const ParametrosRequisitos: React.FC = () => {
   useEffect(() => {
     if (contexto.requisitoEspecifico && PARAMETROS_MOCK[contexto.requisitoEspecifico]) {
       const parametrosMock = PARAMETROS_MOCK[contexto.requisitoEspecifico];
-      setParametros(parametrosMock);
-    } else {
-      // Limpiar formulario si no hay requisito seleccionado
+      
+      // Crear valores iniciales para los parámetros
+      const parametrosValues: Record<string, string | number> = {};
+      parametrosMock.parametros.forEach(param => {
+        parametrosValues[param.nombre] = param.valor;
+      });
+      
       setParametros({
-        nombreParametro: '',
-        tipoValidacion: '',
-        valorMinimo: '',
-        valorMaximo: '',
-        unidadMedida: '',
-        tolerancia: '',
-        aplicaExcepcion: false,
-        descripcionExcepcion: '',
-        nombreCriterio: 'cuerpo_lista'
+        ...parametrosMock,
+        parametrosValues
+      });
+    } else {
+      setParametros({
+        categoriaRequisito: '',
+        descripcionRequisito: '',
+        obligatoriedad: 'obligatorio',
+        nombreCriterio: 'cuerpo_lista',
+        parametros: [],
+        parametrosValues: {}
       });
     }
   }, [contexto.requisitoEspecifico]);
@@ -234,23 +230,48 @@ export const ParametrosRequisitos: React.FC = () => {
     }));
   };
 
-  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const handleParametroValueChange = (parametroNombre: string, value: string | number) => {
     setParametros(prev => ({
       ...prev,
-      [name]: value as 'cuerpo_lista' | 'lista_completa'
+      parametrosValues: {
+        ...prev.parametrosValues,
+        [parametroNombre]: value
+      }
     }));
   };
 
+  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === 'nombreCriterio') {
+      setParametros(prev => ({
+        ...prev,
+        [name]: value as 'cuerpo_lista' | 'lista_completa'
+      }));
+    } else if (name === 'obligatoriedad') {
+      setParametros(prev => ({
+        ...prev,
+        [name]: value as 'obligatorio' | 'opcional'
+      }));
+    } else {
+      // Para radio buttons de parámetros individuales
+      handleParametroValueChange(name, value);
+    }
+  };
+
   const isFormValid = () => {
-    return (
-      contexto.requisitoEspecifico &&
-      parametros.nombreParametro.trim() &&
-      parametros.tipoValidacion.trim() &&
-      parametros.valorMinimo.trim() &&
-      parametros.valorMaximo.trim() &&
-      parametros.unidadMedida.trim()
-    );
+    if (!contexto.requisitoEspecifico || !parametros.categoriaRequisito || !parametros.descripcionRequisito.trim()) {
+      return false;
+    }
+    
+    // Verificar que todos los parámetros requeridos tengan valor
+    for (const param of parametros.parametros) {
+      const value = parametros.parametrosValues[param.nombre];
+      if (value === undefined || value === '' || value === null) {
+        return false;
+      }
+    }
+    
+    return true;
   };
 
   const handleSaveConfiguration = async () => {
@@ -258,13 +279,9 @@ export const ParametrosRequisitos: React.FC = () => {
     
     setIsSaving(true);
     try {
-      // Simular guardado
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Aquí iría la llamada real al backend
       console.log('Configuración guardada:', { contexto, parametros });
-      
-      // Mostrar mensaje de éxito (se podría usar un toast)
       alert('Configuración guardada exitosamente');
     } catch (error) {
       console.error('Error al guardar:', error);
@@ -282,20 +299,66 @@ export const ParametrosRequisitos: React.FC = () => {
   const showBloque2 = Boolean(contexto.tipoMateria);
   const showRestoBloques = Boolean(contexto.requisitoEspecifico);
 
+  const renderParametro = (param: ParametroIndividual) => {
+    const currentValue = parametros.parametrosValues[param.nombre] || param.valor;
+    
+    switch (param.tipo) {
+      case 'number':
+        return (
+          <Input
+            key={param.nombre}
+            label={`${param.nombre} (${param.unidad})`}
+            name={param.nombre}
+            type="number"
+            value={currentValue.toString()}
+            onChange={(e) => handleParametroValueChange(param.nombre, Number(e.target.value))}
+            min={param.min}
+            max={param.max}
+            required
+          />
+        );
+      
+      case 'select':
+        return (
+          <Select
+            key={param.nombre}
+            label={`${param.nombre} (${param.unidad})`}
+            name={param.nombre}
+            value={currentValue.toString()}
+            onChange={(e) => handleParametroValueChange(param.nombre, e.target.value)}
+            options={param.opciones || []}
+            required
+          />
+        );
+      
+      case 'radio':
+        return (
+          <RadioGroup
+            key={param.nombre}
+            name={param.nombre}
+            label={`${param.nombre} (${param.unidad})`}
+            value={currentValue.toString()}
+            onChange={handleRadioChange}
+            options={param.opciones || []}
+            required
+          />
+        );
+      
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-              Configuración de Parámetros de Evaluación
-            </h1>
-            <p className="text-gray-600">
-              Define los parámetros que serán utilizados para evaluar los requisitos electorales
-            </p>
-          </div>
-        </div>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+          Configuración de Parámetros de Evaluación
+        </h1>
+        <p className="text-gray-600">
+          Define los parámetros que serán utilizados para evaluar los requisitos electorales
+        </p>
       </div>
 
       {/* Configuración Form */}
@@ -310,7 +373,6 @@ export const ParametrosRequisitos: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ml-11">
-            {/* Año */}
             <Select
               label="Año"
               name="ano"
@@ -321,7 +383,6 @@ export const ParametrosRequisitos: React.FC = () => {
               required
             />
 
-            {/* Tipo de Proceso Electoral */}
             <Select
               label="Tipo de Proceso Electoral"
               name="tipoProcesoElectoral"
@@ -333,7 +394,6 @@ export const ParametrosRequisitos: React.FC = () => {
               required
             />
 
-            {/* Tipo de Elección */}
             <Select
               label="Tipo de Elección"
               name="tipoEleccion"
@@ -345,7 +405,6 @@ export const ParametrosRequisitos: React.FC = () => {
               required
             />
 
-            {/* Tipo de Expediente */}
             <Select
               label="Tipo de Expediente"
               name="tipoExpediente"
@@ -357,7 +416,6 @@ export const ParametrosRequisitos: React.FC = () => {
               required
             />
 
-            {/* Tipo de Materia */}
             <Select
               label="Tipo de Materia"
               name="tipoMateria"
@@ -396,16 +454,39 @@ export const ParametrosRequisitos: React.FC = () => {
                 
                 {/* Resto del bloque 2 - Solo se muestra si hay requisito seleccionado */}
                 {showRestoBloques && (
-                  <div className="space-y-4">
-                    <Input
-                      label="Nombre del parámetro"
-                      name="nombreParametro"
-                      value={parametros.nombreParametro}
+                  <>
+                    <Select
+                      label="Categoría del requisito"
+                      name="categoriaRequisito"
+                      value={parametros.categoriaRequisito}
                       onChange={handleParametroChange}
-                      placeholder="Nombre descriptivo del parámetro"
+                      options={CATEGORIAS_REQUISITO}
+                      placeholder="Seleccione la categoría"
                       required
                     />
-                  </div>
+                    
+                    <div className="md:col-span-2">
+                      <Input
+                        label="Descripción del Requisito"
+                        name="descripcionRequisito"
+                        value={parametros.descripcionRequisito}
+                        onChange={handleParametroChange}
+                        placeholder="Descripción detallada del requisito..."
+                        required
+                      />
+                    </div>
+                    
+                    <div className="md:col-span-2">
+                      <RadioGroup
+                        name="obligatoriedad"
+                        label="Obligatoriedad"
+                        value={parametros.obligatoriedad}
+                        onChange={handleRadioChange}
+                        options={OPCIONES_OBLIGATORIEDAD}
+                        required
+                      />
+                    </div>
+                  </>
                 )}
               </div>
             </div>
@@ -422,104 +503,23 @@ export const ParametrosRequisitos: React.FC = () => {
               <h2 className="text-xl font-semibold text-gray-800">Parámetros de evaluación</h2>
             </div>
             
-            <div className="ml-11">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Tipo de validación */}
-                <Select
-                  label="Tipo de validación"
-                  name="tipoValidacion"
-                  value={parametros.tipoValidacion}
-                  onChange={handleParametroChange}
-                  options={TIPOS_VALIDACION}
-                  placeholder="Seleccione el tipo"
-                  required
-                />
-
-                {/* Valor mínimo */}
-                <Input
-                  label="Valor mínimo"
-                  name="valorMinimo"
-                  type="number"
-                  value={parametros.valorMinimo}
-                  onChange={handleParametroChange}
-                  placeholder="0"
-                  required
-                />
-
-                {/* Valor máximo */}
-                <Input
-                  label="Valor máximo"
-                  name="valorMaximo"
-                  type="number"
-                  value={parametros.valorMaximo}
-                  onChange={handleParametroChange}
-                  placeholder="100"
-                  required
-                />
-
-                {/* Unidad de medida */}
-                <Select
-                  label="Unidad de medida"
-                  name="unidadMedida"
-                  value={parametros.unidadMedida}
-                  onChange={handleParametroChange}
-                  options={UNIDADES_MEDIDA}
-                  placeholder="Seleccione unidad"
-                  required
-                />
-
-                {/* Tolerancia */}
-                <Input
-                  label="Tolerancia"
-                  name="tolerancia"
-                  type="number"
-                  value={parametros.tolerancia}
-                  onChange={handleParametroChange}
-                  placeholder="0"
-                />
-
-                {/* Aplica excepción */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    ¿Aplica excepción?
-                  </label>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="aplicaExcepcion"
-                      checked={parametros.aplicaExcepcion}
-                      onChange={handleParametroChange}
-                      className="h-4 w-4 text-jne-red focus:ring-jne-red border-gray-300 rounded"
-                    />
-                    <label className="ml-2 text-sm text-gray-700">Sí, aplica excepción</label>
-                  </div>
+            <div className="ml-11 space-y-6">
+              {/* Parámetros dinámicos */}
+              {parametros.parametros.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {parametros.parametros.map((param) => renderParametro(param))}
                 </div>
+              )}
 
-                {/* Descripción de excepción */}
-                {parametros.aplicaExcepcion && (
-                  <div className="md:col-span-2 lg:col-span-3">
-                    <Input
-                      label="Descripción de la excepción"
-                      name="descripcionExcepcion"
-                      value={parametros.descripcionExcepcion}
-                      onChange={handleParametroChange}
-                      placeholder="Describa cuándo aplica la excepción..."
-                    />
-                  </div>
-                )}
-
-                {/* Nombre del criterio - Radio buttons */}
-                <div className="md:col-span-2 lg:col-span-3">
-                  <RadioGroup
-                    name="nombreCriterio"
-                    value={parametros.nombreCriterio}
-                    onChange={handleRadioChange}
-                    options={radioOptions}
-                    label="Nombre del criterio"
-                    required
-                  />
-                </div>
-              </div>
+              {/* Radio buttons para Nombre del criterio */}
+              <RadioGroup
+                name="nombreCriterio"
+                label="Modo de Aplicación"
+                value={parametros.nombreCriterio}
+                onChange={handleRadioChange}
+                options={radioOptions}
+                required
+              />
             </div>
           </div>
         )}
@@ -541,15 +541,12 @@ export const ParametrosRequisitos: React.FC = () => {
                     requisitoEspecifico: ''
                   });
                   setParametros({
-                    nombreParametro: '',
-                    tipoValidacion: '',
-                    valorMinimo: '',
-                    valorMaximo: '',
-                    unidadMedida: '',
-                    tolerancia: '',
-                    aplicaExcepcion: false,
-                    descripcionExcepcion: '',
-                    nombreCriterio: 'cuerpo_lista'
+                    categoriaRequisito: '',
+                    descripcionRequisito: '',
+                    obligatoriedad: 'obligatorio',
+                    nombreCriterio: 'cuerpo_lista',
+                    parametros: [],
+                    parametrosValues: {}
                   });
                 }}
               >
