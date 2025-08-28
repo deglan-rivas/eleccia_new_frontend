@@ -5,6 +5,20 @@ import { RadioGroup } from '../components/forms/RadioGroup';
 import { Button } from '../components/ui/Button';
 import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
+// import { 
+//   ANOS_DISPONIBLES, 
+//   TIPOS_PROCESO_ELECTORAL, 
+//   TIPOS_ELECCION, 
+//   TIPOS_EXPEDIENTE, 
+//   TIPOS_MATERIA,
+//   REQUISITOS_ESPECIFICOS,
+//   PARAMETROS_MOCK,
+//   CATEGORIAS_REQUISITO,
+//   OPCIONES_OBLIGATORIEDAD,
+//   updateParametrosMock,
+//   type ParametroEvaluacion,
+//   type ParametroIndividual
+// } from '../constants/parametros';
 import { 
   ANOS_DISPONIBLES, 
   TIPOS_PROCESO_ELECTORAL, 
@@ -18,7 +32,7 @@ import {
   updateParametrosMock,
   type ParametroEvaluacion,
   type ParametroIndividual
-} from '../constants/parametros';
+} from '../constants/parametros.temp';
 import { type SelectOption } from '../types';
 
 interface ContextoSeleccion {
@@ -505,6 +519,7 @@ export const ParametrosRequisitos: React.FC = () => {
                       />
                     </div>
                     
+                    {/* 
                     <div className="md:col-span-2">
                       <RadioGroup
                         name="obligatoriedad"
@@ -515,6 +530,7 @@ export const ParametrosRequisitos: React.FC = () => {
                         required
                       />
                     </div>
+                    */}
                   </>
                 )}
               </div>
