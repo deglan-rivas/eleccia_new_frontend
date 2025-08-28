@@ -334,10 +334,10 @@ export const ParametrosRequisitos: React.FC = () => {
     }
   };
 
-  const radioOptions = [
-    { value: 'cuerpo_lista', label: 'Cuerpo de Lista' },
-    { value: 'lista_completa', label: 'Lista Completa' }
-  ];
+  // const radioOptions = [
+  //   { value: 'cuerpo_lista', label: 'Cuerpo de Lista' },
+  //   { value: 'lista_completa', label: 'Lista Completa' }
+  // ];
 
   const showBloque2 = Boolean(contexto.tipoMateria);
   const showRestoBloques = Boolean(contexto.requisitoEspecifico);
@@ -350,7 +350,7 @@ export const ParametrosRequisitos: React.FC = () => {
         return (
           <Input
             key={param.nombre}
-            label={`${param.nombre} (${param.unidad})`}
+            label={param.unidad ? `${param.nombre} (${param.unidad})` : param.nombre}
             name={param.nombre}
             type="number"
             value={currentValue.toString()}
@@ -365,7 +365,7 @@ export const ParametrosRequisitos: React.FC = () => {
         return (
           <Select
             key={param.nombre}
-            label={`${param.nombre} (${param.unidad})`}
+            label={param.unidad ? `${param.nombre} (${param.unidad})` : param.nombre}
             name={param.nombre}
             value={currentValue.toString()}
             onChange={(e) => handleParametroValueChange(param.nombre, e.target.value)}
@@ -379,7 +379,7 @@ export const ParametrosRequisitos: React.FC = () => {
           <RadioGroup
             key={param.nombre}
             name={param.nombre}
-            label={`${param.nombre} (${param.unidad})`}
+            label={param.unidad ? `${param.nombre} (${param.unidad})` : param.nombre}
             value={currentValue.toString()}
             onChange={handleRadioChange}
             options={param.opciones || []}

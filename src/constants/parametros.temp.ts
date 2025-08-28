@@ -174,7 +174,7 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     parametros: [
       {
         nombre: 'Modo de Aplicación',
-        unidad: '*',
+        unidad: '',
         tipo: 'radio',
         valor: 'cuerpo_lista',
         opciones: [
@@ -200,7 +200,7 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     parametros: [
       {
         nombre: 'Modo de Aplicación',
-        unidad: '*',
+        unidad: '',
         tipo: 'radio',
         valor: 'cuerpo_lista',
         opciones: [
@@ -242,7 +242,7 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
       },
       {
         nombre: 'Modo de Aplicación',
-        unidad: '*',
+        unidad: '',
         tipo: 'radio',
         valor: 'cuerpo_lista',
         opciones: [
@@ -276,7 +276,7 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     parametros: [
       {
         nombre: 'Modo de Aplicación',
-        unidad: '*',
+        unidad: '',
         tipo: 'radio',
         valor: 'cuerpo_lista',
         opciones: [
@@ -294,7 +294,7 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     parametros: [
       {
         nombre: 'Modo de Aplicación',
-        unidad: '*',
+        unidad: '',
         tipo: 'radio',
         valor: 'cuerpo_lista',
         opciones: [
