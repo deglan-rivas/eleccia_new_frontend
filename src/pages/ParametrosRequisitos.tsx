@@ -28,7 +28,6 @@ import {
   REQUISITOS_ESPECIFICOS,
   PARAMETROS_MOCK,
   CATEGORIAS_REQUISITO,
-  OPCIONES_OBLIGATORIEDAD,
   updateParametrosMock,
   type ParametroEvaluacion,
   type ParametroIndividual
@@ -550,9 +549,23 @@ export const ParametrosRequisitos: React.FC = () => {
             
             <div className="ml-11 space-y-6">
               {/* Parámetros dinámicos */}
-              {parametros.parametros.length > 0 && (
+              {parametros.parametros.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {parametros.parametros.map((param) => renderParametro(param))}
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
+                  <div className="flex flex-col items-center justify-center space-y-3">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                      <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 font-medium">No hay parámetros configurables</p>
+                      <p className="text-gray-500 text-sm mt-1">EleccIA realiza la validación internamente</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
