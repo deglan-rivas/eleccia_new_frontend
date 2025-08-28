@@ -557,14 +557,14 @@ export const ParametrosRequisitos: React.FC = () => {
               )}
 
               {/* Radio buttons para Nombre del criterio */}
-              <RadioGroup
+              {/* <RadioGroup
                 name="nombreCriterio"
                 label="Modo de Aplicación"
                 value={parametros.nombreCriterio}
                 onChange={handleRadioChange}
                 options={radioOptions}
                 required
-              />
+              /> */}
             </div>
           </div>
         )}

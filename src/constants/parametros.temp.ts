@@ -131,33 +131,22 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     nombreCriterio: 'lista_completa',
     parametros: [
       {
-        nombre: 'Días máximo de plazo',
-        unidad: 'días',
-        tipo: 'number',
-        valor: 30,
-        min: 1,
-        max: 90
-      },
-      {
-        nombre: 'Modalidad de elección',
+        nombre: 'Modalidad',
         unidad: 'tipo',
         tipo: 'select',
-        valor: 'presencial',
+        valor: 'delegados',
         opciones: [
-          { value: 'presencial', label: 'Presencial' },
-          { value: 'virtual', label: 'Virtual' },
-          { value: 'mixta', label: 'Mixta' }
+          { value: 'delegados', label: 'Delegados' },
+          { value: 'afiliados', label: 'Afiliados' }
         ]
       },
       {
-        nombre: 'Validar fecha límite',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
+        nombre: 'Fecha límite',
+        unidad: 'dd/mm/yyyy',
+        tipo: 'number',
+        valor: 20,
+        min: 0,
+        max: 50
       }
     ]
   },
@@ -167,27 +156,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'lista_completa',
     parametros: [
-      {
-        nombre: 'Validación estricta',
-        unidad: 'nivel',
-        tipo: 'select',
-        valor: 'completo',
-        opciones: [
-          { value: 'completo', label: 'Validación completa (6 dígitos)' },
-          { value: 'parcial', label: 'Validación parcial (4 dígitos)' },
-          { value: 'departamento', label: 'Solo departamento (2 dígitos)' }
-        ]
-      },
-      {
-        nombre: 'Permitir corrección',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'no',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      }
     ]
   },
   'acta_lista_candidatos': {
@@ -196,35 +164,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'lista_completa',
     parametros: [
-      {
-        nombre: 'Tolerancia en nombres',
-        unidad: 'caracteres',
-        tipo: 'number',
-        valor: 0,
-        min: 0,
-        max: 5
-      },
-      {
-        nombre: 'Validar orden de lista',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      },
-      {
-        nombre: 'Tipo de coincidencia',
-        unidad: 'nivel',
-        tipo: 'select',
-        valor: 'exacta',
-        opciones: [
-          { value: 'exacta', label: 'Coincidencia exacta' },
-          { value: 'similar', label: 'Coincidencia similar' },
-          { value: 'flexible', label: 'Coincidencia flexible' }
-        ]
-      }
     ]
   },
   'cantidad_regidores': {
@@ -234,29 +173,13 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     nombreCriterio: 'lista_completa',
     parametros: [
       {
-        nombre: 'Cantidad mínima',
-        unidad: 'regidores',
-        tipo: 'number',
-        valor: 5,
-        min: 1,
-        max: 15
-      },
-      {
-        nombre: 'Cantidad máxima',
-        unidad: 'regidores',
-        tipo: 'number',
-        valor: 15,
-        min: 5,
-        max: 30
-      },
-      {
-        nombre: 'Incluir accesitarios',
-        unidad: 'sí/no',
+        nombre: 'Modo de Aplicación',
+        unidad: '*',
         tipo: 'radio',
-        valor: 'sí',
+        valor: 'cuerpo_lista',
         opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
+          { value: 'cuerpo_lista', label: 'Cuerpo de Lista' },
+          { value: 'lista_completa', label: 'Lista Completa' }
         ]
       }
     ]
@@ -267,27 +190,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'lista_completa',
     parametros: [
-      {
-        nombre: 'Nivel de validación',
-        unidad: 'tipo',
-        tipo: 'select',
-        valor: 'exacto',
-        opciones: [
-          { value: 'exacto', label: 'Coincidencia exacta' },
-          { value: 'regional', label: 'Mismo departamento' },
-          { value: 'provincial', label: 'Misma provincia' }
-        ]
-      },
-      {
-        nombre: 'Validar anexos',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'no',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      }
     ]
   },
   'cuota_genero': {
@@ -297,29 +199,13 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     nombreCriterio: 'lista_completa',
     parametros: [
       {
-        nombre: 'Porcentaje mínimo',
-        unidad: '%',
-        tipo: 'number',
-        valor: 50,
-        min: 30,
-        max: 70
-      },
-      {
-        nombre: 'Tolerancia para listas impares',
-        unidad: 'candidatos',
-        tipo: 'number',
-        valor: 1,
-        min: 0,
-        max: 2
-      },
-      {
-        nombre: 'Aplicar a accesitarios',
-        unidad: 'sí/no',
+        nombre: 'Modo de Aplicación',
+        unidad: '*',
         tipo: 'radio',
-        valor: 'sí',
+        valor: 'cuerpo_lista',
         opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
+          { value: 'cuerpo_lista', label: 'Cuerpo de Lista' },
+          { value: 'lista_completa', label: 'Lista Completa' }
         ]
       }
     ]
@@ -330,14 +216,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'lista_completa',
     parametros: [
-      {
-        nombre: 'Porcentaje mínimo',
-        unidad: '%',
-        tipo: 'number',
-        valor: 20,
-        min: 15,
-        max: 30
-      },
       {
         nombre: 'Edad mínima',
         unidad: 'años',
@@ -355,14 +233,21 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
         max: 35
       },
       {
-        nombre: 'Fecha de referencia',
-        unidad: 'momento',
-        tipo: 'select',
-        valor: 'inscripcion',
+        nombre: 'Porcentaje de cumplimiento',
+        unidad: '%',
+        tipo: 'number',
+        valor: 20,
+        min: 1,
+        max: 100
+      },
+      {
+        nombre: 'Modo de Aplicación',
+        unidad: '*',
+        tipo: 'radio',
+        valor: 'cuerpo_lista',
         opciones: [
-          { value: 'inscripcion', label: 'Fecha de inscripción' },
-          { value: 'eleccion', label: 'Fecha de elección' },
-          { value: 'juramentacion', label: 'Fecha de juramentación' }
+          { value: 'cuerpo_lista', label: 'Cuerpo de Lista' },
+          { value: 'lista_completa', label: 'Lista Completa' }
         ]
       }
     ]
@@ -378,30 +263,8 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
         unidad: '%',
         tipo: 'number',
         valor: 15,
-        min: 10,
-        max: 25
-      },
-      {
-        nombre: 'Aplicar solo si aplica',
-        unidad: 'condición',
-        tipo: 'select',
-        valor: 'zona_rural',
-        opciones: [
-          { value: 'zona_rural', label: 'Solo en zonas rurales' },
-          { value: 'siempre', label: 'Siempre aplicar' },
-          { value: 'por_ubigeo', label: 'Según ubigeo específico' }
-        ]
-      },
-      {
-        nombre: 'Documentación requerida',
-        unidad: 'tipo',
-        tipo: 'select',
-        valor: 'certificado',
-        opciones: [
-          { value: 'certificado', label: 'Certificado de comunidad' },
-          { value: 'declaracion', label: 'Declaración jurada' },
-          { value: 'ambos', label: 'Ambos documentos' }
-        ]
+        min: 1,
+        max: 100
       }
     ]
   },
@@ -412,35 +275,13 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     nombreCriterio: 'lista_completa',
     parametros: [
       {
-        nombre: 'Patrón de alternancia',
-        unidad: 'tipo',
-        tipo: 'select',
-        valor: 'estricto',
-        opciones: [
-          { value: 'estricto', label: 'Alternancia estricta' },
-          { value: 'bloques_2', label: 'Por bloques de 2' },
-          { value: 'flexible', label: 'Alternancia flexible' }
-        ]
-      },
-      {
-        nombre: 'Inicio de lista',
-        unidad: 'género',
-        tipo: 'select',
-        valor: 'cualquiera',
-        opciones: [
-          { value: 'cualquiera', label: 'Cualquier género' },
-          { value: 'femenino', label: 'Debe iniciar mujer' },
-          { value: 'masculino', label: 'Debe iniciar hombre' }
-        ]
-      },
-      {
-        nombre: 'Excepción último tercio',
-        unidad: 'sí/no',
+        nombre: 'Modo de Aplicación',
+        unidad: '*',
         tipo: 'radio',
-        valor: 'sí',
+        valor: 'cuerpo_lista',
         opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
+          { value: 'cuerpo_lista', label: 'Cuerpo de Lista' },
+          { value: 'lista_completa', label: 'Lista Completa' }
         ]
       }
     ]
@@ -452,24 +293,13 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     nombreCriterio: 'lista_completa',
     parametros: [
       {
-        nombre: 'Validar firma digital',
-        unidad: 'sí/no',
+        nombre: 'Modo de Aplicación',
+        unidad: '*',
         tipo: 'radio',
-        valor: 'no',
+        valor: 'cuerpo_lista',
         opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      },
-      {
-        nombre: 'Tipo de firma aceptada',
-        unidad: 'modalidad',
-        tipo: 'select',
-        valor: 'ambas',
-        opciones: [
-          { value: 'fisica', label: 'Solo firma física' },
-          { value: 'digital', label: 'Solo firma digital' },
-          { value: 'ambas', label: 'Ambas modalidades' }
+          { value: 'cuerpo_lista', label: 'Cuerpo de Lista' },
+          { value: 'lista_completa', label: 'Lista Completa' }
         ]
       }
     ]
@@ -480,35 +310,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'lista_completa',
     parametros: [
-      {
-        nombre: 'Número de miembros',
-        unidad: 'personas',
-        tipo: 'number',
-        valor: 3,
-        min: 3,
-        max: 5
-      },
-      {
-        nombre: 'Validar inscripción ROP',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      },
-      {
-        nombre: 'Campos obligatorios',
-        unidad: 'nivel',
-        tipo: 'select',
-        valor: 'completos',
-        opciones: [
-          { value: 'basicos', label: 'Solo nombres y DNI' },
-          { value: 'completos', label: 'Nombres, DNI y firmas' },
-          { value: 'extendidos', label: 'Todos los campos' }
-        ]
-      }
     ]
   },
   'comprobante_de_pago': {
@@ -518,30 +319,20 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     nombreCriterio: 'lista_completa',
     parametros: [
       {
-        nombre: 'Monto mínimo',
+        nombre: 'Monto',
         unidad: 'soles',
         tipo: 'number',
         valor: 1000,
         min: 500,
-        max: 5000
+        max: 10000
       },
       {
-        nombre: 'Días de vigencia',
-        unidad: 'días',
+        nombre: 'Tasa',
+        unidad: 'porcentaje',
         tipo: 'number',
         valor: 30,
-        min: 15,
-        max: 60
-      },
-      {
-        nombre: 'Validar duplicado',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
+        min: 5,
+        max: 95
       }
     ]
   },
@@ -552,33 +343,12 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     nombreCriterio: 'cuerpo_lista',
     parametros: [
       {
-        nombre: 'Años de residencia mínima',
+        nombre: 'Tiempo de residencia',
         unidad: 'años',
         tipo: 'number',
         valor: 2,
         min: 1,
         max: 5
-      },
-      {
-        nombre: 'Tipo de documento aceptado',
-        unidad: 'modalidad',
-        tipo: 'select',
-        valor: 'cualquiera',
-        opciones: [
-          { value: 'recibo_servicio', label: 'Solo recibos de servicio' },
-          { value: 'certificado', label: 'Solo certificado domiciliario' },
-          { value: 'cualquiera', label: 'Cualquier documento válido' }
-        ]
-      },
-      {
-        nombre: 'Validar correspondencia exacta',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
       }
     ]
   },
@@ -588,27 +358,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'cuerpo_lista',
     parametros: [
-      {
-        nombre: 'Formato requerido',
-        unidad: 'tipo',
-        tipo: 'select',
-        valor: 'oficial',
-        opciones: [
-          { value: 'oficial', label: 'Solo formato oficial' },
-          { value: 'libre', label: 'Formato libre' },
-          { value: 'ambos', label: 'Cualquier formato válido' }
-        ]
-      },
-      {
-        nombre: 'Firma requerida',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      }
     ]
   },
   'ddjj_no_deuda': {
@@ -617,24 +366,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'cuerpo_lista',
     parametros: [
-      {
-        nombre: 'Validar con sistema judicial',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'no',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      },
-      {
-        nombre: 'Vigencia máxima',
-        unidad: 'días',
-        tipo: 'number',
-        valor: 90,
-        min: 30,
-        max: 180
-      }
     ]
   },
   'ddjj_de_conciencia': {
@@ -643,37 +374,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'cuerpo_lista',
     parametros: [
-      {
-        nombre: 'Formato requerido',
-        unidad: 'tipo',
-        tipo: 'select',
-        valor: 'pdf_firmado',
-        opciones: [
-          { value: 'pdf_firmado', label: 'PDF con firma digital' },
-          { value: 'documento_fisico', label: 'Documento físico escaneado' },
-          { value: 'ambos', label: 'Ambos formatos' }
-        ]
-      },
-      {
-        nombre: 'Validar formato',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      },
-      {
-        nombre: 'Obligatorio para todos',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      }
     ]
   },
   'ddjj_de_renuncia': {
@@ -682,34 +382,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'cuerpo_lista',
     parametros: [
-      {
-        nombre: 'Días antes del plazo',
-        unidad: 'días',
-        tipo: 'number',
-        valor: 15,
-        min: 1,
-        max: 60
-      },
-      {
-        nombre: 'Validar cargos específicos',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      },
-      {
-        nombre: 'Incluir sector privado',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'no',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      }
     ]
   },
   'ddjj_de_licencia': {
@@ -718,34 +390,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'cuerpo_lista',
     parametros: [
-      {
-        nombre: 'Tiempo mínimo de licencia',
-        unidad: 'meses',
-        tipo: 'number',
-        valor: 3,
-        min: 1,
-        max: 12
-      },
-      {
-        nombre: 'Incluir beneficios',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'no',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      },
-      {
-        nombre: 'Validar fecha efectiva',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      }
     ]
   },
   'ddjj_domicilio_multiple': {
@@ -754,34 +398,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'opcional',
     nombreCriterio: 'cuerpo_lista',
     parametros: [
-      {
-        nombre: 'Máximo domicilios permitidos',
-        unidad: 'cantidad',
-        tipo: 'number',
-        valor: 3,
-        min: 2,
-        max: 5
-      },
-      {
-        nombre: 'Validar domicilio electoral',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      },
-      {
-        nombre: 'Coincidencia con DNI',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      }
     ]
   },
   'ddjj_inscripcion_extranjero': {
@@ -790,34 +406,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'opcional',
     nombreCriterio: 'cuerpo_lista',
     parametros: [
-      {
-        nombre: 'Años mínimos de naturalización',
-        unidad: 'años',
-        tipo: 'number',
-        valor: 5,
-        min: 1,
-        max: 10
-      },
-      {
-        nombre: 'Validar certificado de naturalización',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      },
-      {
-        nombre: 'Verificar registro electoral',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      }
     ]
   },
   'plan_gobierno': {
@@ -826,32 +414,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'lista_completa',
     parametros: [
-      {
-        nombre: 'Porcentaje mínimo concordancia',
-        unidad: '%',
-        tipo: 'number',
-        valor: 80,
-        min: 60,
-        max: 100
-      },
-      {
-        nombre: 'Validar estructura',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      },
-      {
-        nombre: 'Secciones obligatorias',
-        unidad: 'cantidad',
-        tipo: 'number',
-        valor: 5,
-        min: 3,
-        max: 10
-      }
     ]
   },
   'verifica_rop': {
@@ -860,27 +422,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'cuerpo_lista',
     parametros: [
-      {
-        nombre: 'Estado requerido en ROP',
-        unidad: 'estado',
-        tipo: 'select',
-        valor: 'activo',
-        opciones: [
-          { value: 'activo', label: 'Solo activos' },
-          { value: 'cualquiera', label: 'Cualquier estado' },
-          { value: 'habilitado', label: 'Solo habilitados' }
-        ]
-      },
-      {
-        nombre: 'Validación automática',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      }
     ]
   },
   'ddjj_plazo': {
@@ -889,34 +430,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'cuerpo_lista',
     parametros: [
-      {
-        nombre: 'Días máximo después de HV',
-        unidad: 'días',
-        tipo: 'number',
-        valor: 5,
-        min: 0,
-        max: 15
-      },
-      {
-        nombre: 'Validar orden cronológico',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      },
-      {
-        nombre: 'Permitir misma fecha',
-        unidad: 'sí/no',
-        tipo: 'radio',
-        valor: 'sí',
-        opciones: [
-          { value: 'sí', label: 'Sí' },
-          { value: 'no', label: 'No' }
-        ]
-      }
     ]
   }
 };
