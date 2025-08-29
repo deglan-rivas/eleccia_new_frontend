@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Select } from '../components/ui/Select';
 import { Input } from '../components/ui/Input';
+import { DatePicker } from '../components/ui/DatePicker';
 import { RadioGroup } from '../components/forms/RadioGroup';
 import { Button } from '../components/ui/Button';
 import { Toast } from '../components/ui/Toast';
@@ -416,6 +417,18 @@ export const ParametrosRequisitos: React.FC = () => {
             value={currentValue.toString()}
             onChange={handleRadioChange}
             options={param.opciones || []}
+            required
+          />
+        );
+      
+      case 'date':
+        return (
+          <DatePicker
+            key={param.nombre}
+            label={param.unidad ? `${param.nombre} (${param.unidad})` : param.nombre}
+            name={param.nombre}
+            value={currentValue.toString()}
+            onChange={(e) => handleParametroValueChange(param.nombre, e.target.value)}
             required
           />
         );

@@ -191,7 +191,7 @@ export interface ParametroEvaluacion {
 export interface ParametroIndividual {
   nombre: string;
   unidad: string;
-  tipo: 'number' | 'select' | 'radio';
+  tipo: 'number' | 'select' | 'radio' | 'date';
   valor: string | number;
   opciones?: SelectOption[]; // Para selects y radios
   min?: number; // Para inputs numéricos
@@ -220,10 +220,8 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
       {
         nombre: 'Fecha límite',
         unidad: 'dd/mm/yyyy',
-        tipo: 'number',
-        valor: 20,
-        min: 0,
-        max: 50
+        tipo: 'date',
+        valor: ''
       }
     ]
   },
@@ -249,16 +247,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'lista_completa',
     parametros: [
-      {
-        nombre: 'Modo de Aplicación',
-        unidad: '',
-        tipo: 'radio',
-        valor: 'cuerpo_lista',
-        opciones: [
-          { value: 'cuerpo_lista', label: 'Cuerpo de Lista' },
-          { value: 'lista_completa', label: 'Lista Completa' }
-        ]
-      }
     ]
   },
   'ubigeo_pg': {
@@ -369,16 +357,6 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'lista_completa',
     parametros: [
-      {
-        nombre: 'Modo de Aplicación',
-        unidad: '',
-        tipo: 'radio',
-        valor: 'cuerpo_lista',
-        opciones: [
-          { value: 'cuerpo_lista', label: 'Cuerpo de Lista' },
-          { value: 'lista_completa', label: 'Lista Completa' }
-        ]
-      }
     ]
   },
   'comite_elec': {
