@@ -322,7 +322,7 @@ export const ParametrosRequisitos: React.FC = () => {
       updateConfiguracionContexto(contexto, parametros.parametrosValues);
       
       // Generar objeto de salida según especificaciones
-      const objetoSalida = generarObjetoSalida(contexto, parametros.parametrosValues);
+      const objetoSalida = generarObjetoSalida(contexto, parametros.parametrosValues, parametros);
       
       // Enviar JSON al backend
       let backendSuccess = false;
@@ -332,7 +332,7 @@ export const ParametrosRequisitos: React.FC = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-          timeout: 30000 // 10 segundos de timeout
+          timeout: 30000 // 30 segundos de timeout
         });
         
         console.log('✅ Respuesta del backend:', response.data);

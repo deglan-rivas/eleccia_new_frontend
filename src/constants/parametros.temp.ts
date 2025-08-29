@@ -112,15 +112,15 @@ export const TIPOS_EXPEDIENTE: Record<string, SelectOption[]> = {
 
 export const TIPOS_MATERIA: Record<string, SelectOption[]> = {
   'inscripcion_listas': [
-    { value: 'apelacion', label: 'Apelacion' },
-    { value: 'exclusion_candidato', label: 'Exclusion candidato' },
-    { value: 'exclusion_lista', label: 'Exclusion lista' },
-    { value: 'queja_tramitacion', label: 'Queja tramitacion' },
-    { value: 'solicitud_inscripcion', label: 'Solicitud inscripcion' }, // 5
-    { value: 'tacha_candidato', label: 'Tacha candidato' },
-    { value: 'tacha_lista', label: 'Tacha lista' },
-    { value: 'renuncia_candidato', label: 'Renuncia candidato' },
-    { value: 'retiro_candidato', label: 'Retiro candidato' }
+    { value: 'apelacion', label: 'Apelación' },
+    { value: 'exclusion_candidato', label: 'Exclusion de Candidato' },
+    { value: 'exclusion_lista', label: 'Exclusion de Lista' },
+    // { value: 'queja_tramitacion', label: 'Queja tramitación' },
+    { value: 'solicitud_inscripcion', label: 'Solicitud de Inscripcion' }, // 5
+    { value: 'tacha_candidato', label: 'Tacha de Candidato' },
+    { value: 'tacha_lista', label: 'Tacha de Lista' },
+    { value: 'renuncia_candidato', label: 'Renuncia de Candidato' },
+    { value: 'retiro_candidato', label: 'Retiro de Candidato' }
   ]
 };
 
@@ -607,16 +607,18 @@ export const updateConfiguracionContexto = (
 };
 
 // Función para generar objeto de salida según especificaciones
-export const generarObjetoSalida = (contexto: {
-  ano: string;
-  tipoProcesoElectoral: string;
-  tipoEleccion: string;
-  tipoExpediente: string;
-  tipoMateria: string;
-  requisitoEspecifico: string;
-}, parametrosValues: Record<string, string | number>) => {
-  const parametroBase = PARAMETROS_MOCK[contexto.requisitoEspecifico];
-  
+export const generarObjetoSalida = (
+  contexto: {
+    ano: string;
+    tipoProcesoElectoral: string;
+    tipoEleccion: string;
+    tipoExpediente: string;
+    tipoMateria: string;
+    requisitoEspecifico: string;
+  }, 
+  parametrosValues: Record<string, string | number>,
+  parametrosActuales: ParametroEvaluacion
+) => {
   return {
     ANIO: ID_MAPPINGS.ANOS[contexto.ano as keyof typeof ID_MAPPINGS.ANOS],
     TIPO_PROCESO: ID_MAPPINGS.TIPOS_PROCESO[contexto.tipoProcesoElectoral as keyof typeof ID_MAPPINGS.TIPOS_PROCESO],
@@ -624,8 +626,8 @@ export const generarObjetoSalida = (contexto: {
     ID_TIPO_EXPEDIENTE: ID_MAPPINGS.TIPOS_EXPEDIENTE[contexto.tipoExpediente as keyof typeof ID_MAPPINGS.TIPOS_EXPEDIENTE],
     ID_MATERIA: ID_MAPPINGS.TIPOS_MATERIA[contexto.tipoMateria as keyof typeof ID_MAPPINGS.TIPOS_MATERIA],
     ID_REQUISITO: ID_MAPPINGS.REQUISITOS[contexto.requisitoEspecifico as keyof typeof ID_MAPPINGS.REQUISITOS],
-    TIPO_REQUISITO: ID_MAPPINGS.CATEGORIAS_REQUISITO[parametroBase?.categoriaRequisito as keyof typeof ID_MAPPINGS.CATEGORIAS_REQUISITO],
-    DESCRIPCION: parametroBase?.descripcionRequisito || '',
+    TIPO_REQUISITO: ID_MAPPINGS.CATEGORIAS_REQUISITO[parametrosActuales.categoriaRequisito as keyof typeof ID_MAPPINGS.CATEGORIAS_REQUISITO],
+    DESCRIPCION: parametrosActuales.descripcionRequisito || '',
     CONF_PARAM: parametrosValues
   };
 };
