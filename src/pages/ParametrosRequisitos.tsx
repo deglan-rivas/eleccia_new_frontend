@@ -389,6 +389,7 @@ export const ParametrosRequisitos: React.FC = () => {
             onChange={(e) => handleParametroValueChange(param.nombre, Number(e.target.value))}
             min={param.min}
             max={param.max}
+            step={param.step}
             required
           />
         );

@@ -3,33 +3,38 @@ import { type SelectOption } from '../types';
 // Mapeos de IDs según especificaciones del backend
 export const ID_MAPPINGS = {
   ANOS: {
-    '2022': 2022
+    '2022': 2022,
+    '2025': 2025
   },
+  // schema SIJE, tabla SIJE_TRF_TIPO_PROCESO
   TIPOS_PROCESO: {
-    'elecciones_regionales': 2
+    'elecciones_regionales': 2,
+    'elecciones_complementarias': 61,
+    'elecciones_generales': 3
   },
+  // schema SIJE, tabla SIJE_TRF_TIPO_ELECCION
   TIPOS_ELECCION: {
-    'municipal_provincial': 7,
-    'municipal_distrital': 6, // ID diferente según especificaciones
-    'constituyente': 8 // ID diferente según especificaciones
+    'municipal_provincial': 5,
+    'municipal_distrital': 6,
+    'constituyente': 13
   },
   TIPOS_EXPEDIENTE: {
     'inscripcion_listas': 1,
-    'publicidad_estatal': 2, // Asumir, corregir si es diferente
-    'propaganda_electoral': 3, // Asumir, corregir si es diferente
-    'acta_electoral': 4, // Asumir, corregir si es diferente
-    'nulidad_electoral': 5 // Asumir, corregir si es diferente
+    'publicidad_estatal': 2,
+    'propaganda_electoral': 3,
+    'acta_electoral': 4,
+    'nulidad_electoral': 5
   },
   TIPOS_MATERIA: {
     'solicitud_inscripcion': 5,
-    'apelacion': 1, // Asumir, corregir si es diferente
-    'exclusion_candidato': 2, // Asumir, corregir si es diferente
-    'exclusion_lista': 3, // Asumir, corregir si es diferente
-    'queja_tramitacion': 4, // Asumir, corregir si es diferente
-    'tacha_candidato': 6, // Asumir, corregir si es diferente
-    'tacha_lista': 7, // Asumir, corregir si es diferente
-    'renuncia_candidato': 8, // Asumir, corregir si es diferente
-    'retiro_candidato': 9 // Asumir, corregir si es diferente
+    'apelacion': 1,
+    'exclusion_candidato': 2,
+    'exclusion_lista': 3,
+    'queja_tramitacion': 4,
+    'tacha_candidato': 6,
+    'tacha_lista': 7,
+    'renuncia_candidato': 8,
+    'retiro_candidato': 9
   },
   REQUISITOS: {
     'acta_plazo': 6,
@@ -65,13 +70,17 @@ export const ID_MAPPINGS = {
 };
 
 export const ANOS_DISPONIBLES: SelectOption[] = [
-  { value: '2022', label: '2022' }
+  { value: '2022', label: '2022' },
+  { value: '2025', label: '2025' }
 ];
 
 export const TIPOS_PROCESO_ELECTORAL: Record<string, SelectOption[]> = {
   '2022': [
     { value: 'elecciones_regionales', label: 'Elecciones Regionales y Municipales' } // 2
-  ]
+  ],
+  '2025': [
+    { value: 'elecciones_complementarias', label: 'Elecciones Municipales Complementarias' } // 2
+  ],
 };
 
 export const TIPOS_ELECCION: Record<string, SelectOption[]> = {
@@ -79,6 +88,9 @@ export const TIPOS_ELECCION: Record<string, SelectOption[]> = {
     { value: 'municipal_provincial', label: 'Municipal Provincial' },
     { value: 'municipal_distrital', label: 'Municipal Distrital' }, // 6
     { value: 'constituyente', label: 'Constituyente' },
+  ],
+  'elecciones_complementarias': [
+    { value: 'municipal_distrital', label: 'Municipal Distrital' }, // 6
   ]
 };
 
@@ -184,6 +196,7 @@ export interface ParametroIndividual {
   opciones?: SelectOption[]; // Para selects y radios
   min?: number; // Para inputs numéricos
   max?: number; // Para inputs numéricos
+  step?: number; // Para controlar incrementos en inputs numéricos (ej: 1 para enteros, 0.01 para decimales)
 }
 
 // Esta variable es mutable para simular actualizaciones del backend
@@ -395,8 +408,9 @@ export const PARAMETROS_MOCK: Record<string, ParametroEvaluacion> = {
         unidad: 'porcentaje',
         tipo: 'number',
         valor: 30,
-        min: 5,
-        max: 95
+        min: 1,
+        max: 95,
+        step: 0.01
       }
     ]
   },
