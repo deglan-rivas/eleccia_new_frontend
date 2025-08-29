@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Select } from '../components/ui/Select';
 import { Input } from '../components/ui/Input';
 import { RadioGroup } from '../components/forms/RadioGroup';
 import { Button } from '../components/ui/Button';
 import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
+import { PARAMETROS_ENDPOINTS, buildUrl } from '../config/endpoints';
 // import { 
 //   ANOS_DISPONIBLES, 
 //   TIPOS_PROCESO_ELECTORAL, 
@@ -28,7 +30,9 @@ import {
   REQUISITOS_ESPECIFICOS,
   PARAMETROS_MOCK,
   CATEGORIAS_REQUISITO,
-  updateParametrosMock,
+  getConfiguracionContexto,
+  updateConfiguracionContexto,
+  generarObjetoSalida,
   type ParametroEvaluacion,
   type ParametroIndividual
 } from '../constants/parametros.temp';
@@ -209,16 +213,31 @@ export const ParametrosRequisitos: React.FC = () => {
     if (contexto.requisitoEspecifico && PARAMETROS_MOCK[contexto.requisitoEspecifico]) {
       const parametrosMock = PARAMETROS_MOCK[contexto.requisitoEspecifico];
       
-      // Crear valores iniciales para los parámetros
-      const parametrosValues: Record<string, string | number> = {};
-      parametrosMock.parametros.forEach(param => {
-        parametrosValues[param.nombre] = param.valor;
-      });
+      // Verificar si todos los campos del contexto están completos
+      const contextoCompleto = contexto.ano && contexto.tipoProcesoElectoral && 
+                              contexto.tipoEleccion && contexto.tipoExpediente && 
+                              contexto.tipoMateria && contexto.requisitoEspecifico;
       
-      setParametros({
-        ...parametrosMock,
-        parametrosValues
-      });
+      if (contextoCompleto) {
+        // Obtener configuración específica del contexto
+        const configuracionContexto = getConfiguracionContexto(contexto);
+        
+        setParametros({
+          ...parametrosMock,
+          parametrosValues: configuracionContexto.parametrosValues
+        });
+      } else {
+        // Si el contexto no está completo, usar valores por defecto
+        const parametrosValues: Record<string, string | number> = {};
+        parametrosMock.parametros.forEach(param => {
+          parametrosValues[param.nombre] = param.valor;
+        });
+        
+        setParametros({
+          ...parametrosMock,
+          parametrosValues
+        });
+      }
     } else {
       setParametros({
         categoriaRequisito: '',
@@ -229,7 +248,7 @@ export const ParametrosRequisitos: React.FC = () => {
         parametrosValues: {}
       });
     }
-  }, [contexto.requisitoEspecifico]);
+  }, [contexto]);
 
   const handleContextoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -299,30 +318,44 @@ export const ParametrosRequisitos: React.FC = () => {
       // Simular delay de red
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Actualizar los parámetros con los valores del formulario
-      const parametrosActualizados: ParametroEvaluacion = {
-        categoriaRequisito: parametros.categoriaRequisito,
-        descripcionRequisito: parametros.descripcionRequisito,
-        obligatoriedad: parametros.obligatoriedad,
-        nombreCriterio: parametros.nombreCriterio,
-        parametros: parametros.parametros.map(param => ({
-          ...param,
-          valor: parametros.parametrosValues[param.nombre] || param.valor
-        }))
-      };
+      // Actualizar la configuración en el contexto jerárquico
+      updateConfiguracionContexto(contexto, parametros.parametrosValues);
       
-      // Guardar en el mockup (simula actualización del backend)
-      updateParametrosMock(contexto.requisitoEspecifico, parametrosActualizados);
+      // Generar objeto de salida según especificaciones
+      const objetoSalida = generarObjetoSalida(contexto, parametros.parametrosValues);
       
-      console.log('✅ Configuración guardada exitosamente:', {
-        requisito: contexto.requisitoEspecifico,
-        contexto: contexto,
-        parametros: parametrosActualizados
-      });
+      // Enviar JSON al backend
+      let backendSuccess = false;
+      try {
+        const endpointUrl = buildUrl(PARAMETROS_ENDPOINTS.SAVE_CONFIGURATION);
+        const response = await axios.post(endpointUrl, objetoSalida, {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          timeout: 30000 // 10 segundos de timeout
+        });
+        
+        console.log('✅ Respuesta del backend:', response.data);
+        backendSuccess = true;
+      } catch (backendError) {
+        console.warn('⚠️ Error al comunicar con backend (continuando con funcionalidad local):', backendError);
+        // No lanzamos error para no interrumpir la funcionalidad local
+        backendSuccess = false;
+      }
+      
+      // Imprimir en consola con formato especificado
+      console.log('📋 Configuración guardada:', objetoSalida);
       
       // Mostrar mensaje de éxito con Toast
+      const requistoLabel = REQUISITOS_ESPECIFICOS[contexto.tipoMateria]?.find(r => r.value === contexto.requisitoEspecifico)?.label;
+      const parametrosInfo = parametros.parametros.length > 0 ? 
+        `con ${parametros.parametros.length} parámetro(s) configurado(s)` : 
+        'sin parámetros configurables (EleccIA maneja la validación internamente)';
+      
+      const backendStatus = backendSuccess ? '✅ Enviado al backend' : '⚠️ Solo guardado localmente';
+      
       showSuccess(
-        `Configuración guardada exitosamente para el requisito "${REQUISITOS_ESPECIFICOS[contexto.tipoMateria]?.find(r => r.value === contexto.requisitoEspecifico)?.label}"`
+        `Configuración guardada exitosamente para el requisito "${requistoLabel}" ${parametrosInfo}. ${backendStatus}.`
       );
       
     } catch (error) {

@@ -39,6 +39,15 @@ export const USER_ENDPOINTS = {
 } as const;
 
 /**
+ * Parámetros de requisitos endpoints
+ */
+export const PARAMETROS_ENDPOINTS = {
+  SAVE_CONFIGURATION: '/plataforma/guarda_parametros',
+  GET_CONFIGURATION: '/parametros/obtener_configuracion',
+  LIST_CONFIGURATIONS: '/parametros/listar_configuraciones'
+} as const;
+
+/**
  * System endpoints
  */
 export const SYSTEM_ENDPOINTS = {

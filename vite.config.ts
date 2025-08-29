@@ -8,4 +8,17 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  server: {
+    // host: '0.0.0.0'
+    host: true
+  }
+  // server: {
+  //   proxy: {
+  //     '/plataforma': {
+  //       target: 'http://192.168.27.222:5010',
+  //       changeOrigin: true,
+  //       secure: false
+  //     }
+  //   }
+  // },
 })

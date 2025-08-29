@@ -1,5 +1,69 @@
 import { type SelectOption } from '../types';
 
+// Mapeos de IDs según especificaciones del backend
+export const ID_MAPPINGS = {
+  ANOS: {
+    '2022': 2022
+  },
+  TIPOS_PROCESO: {
+    'elecciones_regionales': 2
+  },
+  TIPOS_ELECCION: {
+    'municipal_provincial': 7,
+    'municipal_distrital': 6, // ID diferente según especificaciones
+    'constituyente': 8 // ID diferente según especificaciones
+  },
+  TIPOS_EXPEDIENTE: {
+    'inscripcion_listas': 1,
+    'publicidad_estatal': 2, // Asumir, corregir si es diferente
+    'propaganda_electoral': 3, // Asumir, corregir si es diferente
+    'acta_electoral': 4, // Asumir, corregir si es diferente
+    'nulidad_electoral': 5 // Asumir, corregir si es diferente
+  },
+  TIPOS_MATERIA: {
+    'solicitud_inscripcion': 5,
+    'apelacion': 1, // Asumir, corregir si es diferente
+    'exclusion_candidato': 2, // Asumir, corregir si es diferente
+    'exclusion_lista': 3, // Asumir, corregir si es diferente
+    'queja_tramitacion': 4, // Asumir, corregir si es diferente
+    'tacha_candidato': 6, // Asumir, corregir si es diferente
+    'tacha_lista': 7, // Asumir, corregir si es diferente
+    'renuncia_candidato': 8, // Asumir, corregir si es diferente
+    'retiro_candidato': 9 // Asumir, corregir si es diferente
+  },
+  REQUISITOS: {
+    'acta_plazo': 6,
+    'ubigeo_electoral': 7,
+    'acta_lista_candidatos': 8,
+    'cantidad_regidores': 20,
+    'ubigeo_pg': 22,
+    'cuota_genero': 1,
+    'cuota_joven': 2,
+    'cuota_comunidad_campesina': 3,
+    'paridad': 4,
+    'solicitud_inscripcion_firmada': 5,
+    'comite_elec': 23,
+    'comprobante_de_pago': 9,
+    'ubigeo_candidato': 10,
+    'ddjj_consentimiento': 11,
+    'ddjj_no_deuda': 12,
+    'ddjj_de_conciencia': 13,
+    'ddjj_de_renuncia': 14,
+    'ddjj_de_licencia': 15,
+    'ddjj_domicilio_multiple': 16,
+    'ddjj_inscripcion_extranjero': 17,
+    'plan_gobierno': 18,
+    'verifica_rop': 19,
+    'ddjj_plazo': 21
+  },
+  CATEGORIAS_REQUISITO: {
+    'solicitud_inscripcion': 1,
+    'acta_eleccion_interna': 2,
+    'hoja_vida_candidato': 3,
+    'plan_gobierno': 4
+  }
+};
+
 export const ANOS_DISPONIBLES: SelectOption[] = [
   { value: '2022', label: '2022' }
 ];
@@ -19,15 +83,15 @@ export const TIPOS_ELECCION: Record<string, SelectOption[]> = {
 };
 
 export const TIPOS_EXPEDIENTE: Record<string, SelectOption[]> = {
-  // 'municipal_provincial': [
-  //   { value: 'inscripcion_listas', label: 'Inscripción de Listas' }, // 1
-  //   { value: 'publicidad_estatal', label: 'Publicidad Estatal' },
-  //   { value: 'propaganda_electoral', label: 'Propaganda Electoral' },
-  //   { value: 'acta_electoral', label: 'Acta Electoral' },
-  //   { value: 'nulidad_electoral', label: 'Nulidad Electoral' }
-  // ],
   'municipal_provincial': [
+    { value: 'inscripcion_listas', label: 'Inscripción de Listas' }, // 1
+    { value: 'publicidad_estatal', label: 'Publicidad Estatal' },
+    { value: 'propaganda_electoral', label: 'Propaganda Electoral' },
+    { value: 'acta_electoral', label: 'Acta Electoral' },
+    { value: 'nulidad_electoral', label: 'Nulidad Electoral' }
   ],
+  // 'municipal_provincial': [
+  // ],
   'municipal_distrital': [
     { value: 'inscripcion_listas', label: 'Inscripción de Listas' },
     { value: 'publicidad_estatal', label: 'Publicidad Estatal' },
@@ -35,15 +99,15 @@ export const TIPOS_EXPEDIENTE: Record<string, SelectOption[]> = {
     { value: 'acta_electoral', label: 'Acta Electoral' },
     { value: 'nulidad_electoral', label: 'Nulidad Electoral' }
   ],
-  // 'constituyente': [
-  //   { value: 'inscripcion_listas', label: 'Inscripción de Listas' },
-  //   { value: 'publicidad_estatal', label: 'Publicidad Estatal' },
-  //   { value: 'propaganda_electoral', label: 'Propaganda Electoral' },
-  //   { value: 'acta_electoral', label: 'Acta Electoral' },
-  //   { value: 'nulidad_electoral', label: 'Nulidad Electoral' }
-  // ]
   'constituyente': [
+    { value: 'inscripcion_listas', label: 'Inscripción de Listas' },
+    { value: 'publicidad_estatal', label: 'Publicidad Estatal' },
+    { value: 'propaganda_electoral', label: 'Propaganda Electoral' },
+    { value: 'acta_electoral', label: 'Acta Electoral' },
+    { value: 'nulidad_electoral', label: 'Nulidad Electoral' }
   ]
+  // 'constituyente': [
+  // ]
 };
 
 export const TIPOS_MATERIA: Record<string, SelectOption[]> = {
@@ -456,7 +520,117 @@ export const UNIDADES_MEDIDA: SelectOption[] = [
   { value: 'cantidad', label: 'cantidad' }
 ];
 
-// Función para actualizar parámetros mock (simula actualización del backend)
+// Estructura jerárquica para configuraciones únicas por contexto
+export interface ConfiguracionContexto {
+  parametrosValues: Record<string, string | number>;
+  configuracionGuardada?: boolean;
+}
+
+// Store jerárquico para configuraciones por contexto único
+// Estructura: CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral][tipoEleccion][tipoExpediente][tipoMateria][requisitoEspecifico]
+export const CONFIGURACIONES_CONTEXTO: Record<string, Record<string, Record<string, Record<string, Record<string, Record<string, ConfiguracionContexto>>>>>> = {};
+
+// Función para generar clave única de contexto
+export const generateContextKey = (contexto: {
+  ano: string;
+  tipoProcesoElectoral: string;
+  tipoEleccion: string;
+  tipoExpediente: string;
+  tipoMateria: string;
+  requisitoEspecifico: string;
+}): string => {
+  return `${contexto.ano}_${contexto.tipoProcesoElectoral}_${contexto.tipoEleccion}_${contexto.tipoExpediente}_${contexto.tipoMateria}_${contexto.requisitoEspecifico}`;
+};
+
+// Función para obtener configuración de contexto específico
+export const getConfiguracionContexto = (contexto: {
+  ano: string;
+  tipoProcesoElectoral: string;
+  tipoEleccion: string;
+  tipoExpediente: string;
+  tipoMateria: string;
+  requisitoEspecifico: string;
+}): ConfiguracionContexto => {
+  const { ano, tipoProcesoElectoral, tipoEleccion, tipoExpediente, tipoMateria, requisitoEspecifico } = contexto;
+  
+  // Inicializar estructura jerárquica si no existe
+  if (!CONFIGURACIONES_CONTEXTO[ano]) {
+    CONFIGURACIONES_CONTEXTO[ano] = {};
+  }
+  if (!CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral]) {
+    CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral] = {};
+  }
+  if (!CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral][tipoEleccion]) {
+    CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral][tipoEleccion] = {};
+  }
+  if (!CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral][tipoEleccion][tipoExpediente]) {
+    CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral][tipoEleccion][tipoExpediente] = {};
+  }
+  if (!CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral][tipoEleccion][tipoExpediente][tipoMateria]) {
+    CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral][tipoEleccion][tipoExpediente][tipoMateria] = {};
+  }
+  if (!CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral][tipoEleccion][tipoExpediente][tipoMateria][requisitoEspecifico]) {
+    // Inicializar con valores por defecto del PARAMETROS_MOCK
+    const parametroBase = PARAMETROS_MOCK[requisitoEspecifico];
+    const valoresIniciales: Record<string, string | number> = {};
+    
+    if (parametroBase && parametroBase.parametros) {
+      parametroBase.parametros.forEach(param => {
+        valoresIniciales[param.nombre] = param.valor;
+      });
+    }
+    
+    CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral][tipoEleccion][tipoExpediente][tipoMateria][requisitoEspecifico] = {
+      parametrosValues: valoresIniciales,
+      configuracionGuardada: false
+    };
+  }
+  
+  return CONFIGURACIONES_CONTEXTO[ano][tipoProcesoElectoral][tipoEleccion][tipoExpediente][tipoMateria][requisitoEspecifico];
+};
+
+// Función para actualizar configuración de contexto específico
+export const updateConfiguracionContexto = (
+  contexto: {
+    ano: string;
+    tipoProcesoElectoral: string;
+    tipoEleccion: string;
+    tipoExpediente: string;
+    tipoMateria: string;
+    requisitoEspecifico: string;
+  },
+  parametrosValues: Record<string, string | number>
+): void => {
+  const configuracion = getConfiguracionContexto(contexto);
+  configuracion.parametrosValues = { ...configuracion.parametrosValues, ...parametrosValues };
+  configuracion.configuracionGuardada = true;
+};
+
+// Función para generar objeto de salida según especificaciones
+export const generarObjetoSalida = (contexto: {
+  ano: string;
+  tipoProcesoElectoral: string;
+  tipoEleccion: string;
+  tipoExpediente: string;
+  tipoMateria: string;
+  requisitoEspecifico: string;
+}, parametrosValues: Record<string, string | number>) => {
+  const parametroBase = PARAMETROS_MOCK[contexto.requisitoEspecifico];
+  
+  return {
+    ANIO: ID_MAPPINGS.ANOS[contexto.ano as keyof typeof ID_MAPPINGS.ANOS],
+    TIPO_PROCESO: ID_MAPPINGS.TIPOS_PROCESO[contexto.tipoProcesoElectoral as keyof typeof ID_MAPPINGS.TIPOS_PROCESO],
+    TIPO_ELECCION: ID_MAPPINGS.TIPOS_ELECCION[contexto.tipoEleccion as keyof typeof ID_MAPPINGS.TIPOS_ELECCION],
+    ID_TIPO_EXPEDIENTE: ID_MAPPINGS.TIPOS_EXPEDIENTE[contexto.tipoExpediente as keyof typeof ID_MAPPINGS.TIPOS_EXPEDIENTE],
+    ID_MATERIA: ID_MAPPINGS.TIPOS_MATERIA[contexto.tipoMateria as keyof typeof ID_MAPPINGS.TIPOS_MATERIA],
+    ID_REQUISITO: ID_MAPPINGS.REQUISITOS[contexto.requisitoEspecifico as keyof typeof ID_MAPPINGS.REQUISITOS],
+    TIPO_REQUISITO: ID_MAPPINGS.CATEGORIAS_REQUISITO[parametroBase?.categoriaRequisito as keyof typeof ID_MAPPINGS.CATEGORIAS_REQUISITO],
+    DESCRIPCION: parametroBase?.descripcionRequisito || '',
+    CONF_PARAM: parametrosValues
+  };
+};
+
+// Función para actualizar parámetros mock (mantenida para compatibilidad)
 export const updateParametrosMock = (
   requisitoId: string, 
   parametrosActualizados: ParametroEvaluacion
@@ -466,7 +640,7 @@ export const updateParametrosMock = (
   }
 };
 
-// Función para obtener parámetros mock (simula consulta al backend)
+// Función para obtener parámetros mock (mantenida para compatibilidad)
 export const getParametrosMock = (requisitoId: string): ParametroEvaluacion | null => {
   return PARAMETROS_MOCK[requisitoId] || null;
 };
