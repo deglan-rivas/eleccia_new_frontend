@@ -39,9 +39,9 @@ class ExpedienteService {
    */
   async getExpedienteDetail(idExpediente: string): Promise<ExpedienteDetailData> {
     try {
-      const response = await apiClient.get<BackendExpedienteResponse>('/ver_analisis_expediente', {
+      const response = await apiClient.get<BackendExpedienteResponse>('/expediente/analisis', {
         params: {
-          id_expediente: idExpediente
+          codigo: idExpediente
         }
       });
 

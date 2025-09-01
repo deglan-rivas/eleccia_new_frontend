@@ -22,7 +22,7 @@ export const AUTH_ENDPOINTS = {
  * Expediente endpoints
  */
 export const EXPEDIENTE_ENDPOINTS = {
-  GET_DETAIL: '/ver_analisis_expediente',
+  GET_DETAIL: '/expediente/analisis',
   SAVE_CHANGES: '/guardar_cambios_requisitos',
   GENERATE_RESOLUTION: '/generar_resolucion',
   LIST_RESOLUCIONES: '/listado_resoluciones_expediente'
@@ -45,6 +45,20 @@ export const PARAMETROS_ENDPOINTS = {
   SAVE_CONFIGURATION: '/plataforma/guarda_parametros',
   GET_CONFIGURATION: '/parametros/obtener_configuracion',
   LIST_CONFIGURATIONS: '/parametros/listar_configuraciones'
+} as const;
+
+/**
+ * Backend endpoints para procesamiento de expedientes
+ */
+export const BACKEND_ENDPOINTS = {
+  CALIFICAR_EXPEDIENTE: '/expediente/calificar_expediente'
+} as const;
+
+/**
+ * Backend URLs específicas (para endpoints que usan servidores diferentes)
+ */
+export const BACKEND_URLS = {
+  CALIFICAR_EXPEDIENTE_BASE: 'http://192.168.27.222:5010'
 } as const;
 
 /**

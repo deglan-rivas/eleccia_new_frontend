@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import apiClient from '../config/axios';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
+import { BACKEND_ENDPOINTS, BACKEND_URLS } from '../config/endpoints';
 
 interface FormData {
   num_expediente: string;
@@ -77,7 +79,7 @@ const validateExpedienteFormat = (expediente: string): ValidationResult => {
 };
 
 export const Home: React.FC = () => {
-  const { toast, showSuccess, showError, hideToast } = useToast();
+  const { toast, showError, hideToast } = useToast();
   const [formData, setFormData] = useState<FormData>({
     num_expediente: '',
     tipo_expediente: '1',
@@ -85,12 +87,24 @@ export const Home: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<{
+    show: boolean;
+    expediente: string;
+    processingTime: string;
+    dashboardUrl: string;
+  }>({
+    show: false,
+    expediente: '',
+    processingTime: '',
+    dashboardUrl: ''
+  });
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     if (error) setError(null);
+    if (success.show) setSuccess(prev => ({ ...prev, show: false }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -122,29 +136,79 @@ export const Home: React.FC = () => {
 
     setLoading(true);
     setError(null);
+    setSuccess(prev => ({ ...prev, show: false }));
+
+    // Marcar el inicio del procesamiento
+    const startTime = Date.now();
 
     try {
-      // TODO: En el futuro, enviar al backend para procesamiento
-      // const response = await fetch('/api/analiza_expediente', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     ...formData,
-      //     num_expediente: formData.num_expediente.trim().toUpperCase()
-      //   })
+      const expedienteFormateado = formData.num_expediente.trim().toUpperCase();
+      
+      // Construir URL con query parameter para el backend específico
+      const endpoint = `${BACKEND_ENDPOINTS.CALIFICAR_EXPEDIENTE}?codigo=${encodeURIComponent(expedienteFormateado)}`;
+      
+      console.log('🚀 Enviando petición al backend:', `${BACKEND_URLS.CALIFICAR_EXPEDIENTE_BASE}${endpoint}`);
+      
+      // Realizar petición POST con timeout de 5 minutos (solo para esta petición)
+      // const response = await apiClient.post(endpoint, {}, {
+      //   baseURL: BACKEND_URLS.CALIFICAR_EXPEDIENTE_BASE, // Override baseURL solo para esta petición
+      //   timeout: 5 * 60 * 1000 // 5 minutos en milisegundos
       // });
+      const fakeBackendCall = (data = {}, delay = 2000) => {
+        return new Promise((resolve, reject) => {
+          // Simula éxito
+          setTimeout(() => {
+            resolve({
+              status: 200,
+              message: "Simulación de respuesta exitosa",
+              data
+            });
+          }, delay);
 
-      // Simular procesamiento por ahora
-      await new Promise(resolve => setTimeout(resolve, 1500));
+          // (Opcional) puedes agregar lógica para simular error:
+          // setTimeout(() => reject(new Error("Error simulado")), delay);
+        });
+      };
+
+      await fakeBackendCall({}, 8400);
       
-      showSuccess(`Expediente ${formData.num_expediente.trim().toUpperCase()} procesado exitosamente`);
+      // Calcular tiempo de procesamiento
+      const endTime = Date.now();
+      const processingTimeMs = endTime - startTime;
+      const processingTimeSeconds = Math.round(processingTimeMs / 1000);
+      const processingTimeFormatted = processingTimeSeconds < 60 
+        ? `${processingTimeSeconds} segundos`
+        : `${Math.round(processingTimeSeconds / 60)} minutos`;
       
-      // TODO: navigate(`/expediente/${result.id}`);
+      // Imprimir respuesta en consola
+      // console.log('📋 Respuesta del backend:', response.data);
+      console.log('⏱️ Tiempo de procesamiento:', processingTimeFormatted);
+      
+      // Mostrar mensaje de éxito en lugar de toast
+      setSuccess({
+        show: true,
+        expediente: expedienteFormateado,
+        processingTime: processingTimeFormatted,
+        dashboardUrl: `/expediente/${expedienteFormateado}` // URL del dashboard
+      });
+      
     } catch (error) {
-      console.error('Error:', error);
-      showError(error instanceof Error ? error.message : 'Ocurrió un error al procesar la solicitud');
+      console.error('❌ Error en backend:', error);
+      
+      if (error && typeof error === 'object' && 'code' in error) {
+        if (error.code === 'ECONNABORTED') {
+          showError('⏱️ Tiempo de espera agotado. El procesamiento del expediente tomó más de 5 minutos.');
+        } else if ('response' in error && error.response) {
+          const axiosError = error as { response: { status: number; data?: { message?: string } } };
+          showError(`Error del servidor: ${axiosError.response.status} - ${axiosError.response.data?.message || 'Error desconocido'}`);
+        } else if ('request' in error) {
+          showError('No se pudo conectar al servidor backend. Verifique la conexión.');
+        } else if ('message' in error) {
+          showError(`Error de configuración: ${(error as { message: string }).message}`);
+        }
+      } else {
+        showError('Ocurrió un error inesperado al procesar el expediente');
+      }
     } finally {
       setLoading(false);
     }
@@ -218,9 +282,45 @@ export const Home: React.FC = () => {
               loading={loading}
               disabled={loading}
             >
-              Analizar Expediente
+              {loading ? 'Procesando...' : 'Analizar Expediente'}
             </Button>
           </div>
+          
+          {loading && (
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-jne-red"></div>
+                <div className="text-sm text-blue-700">
+                  <p className="font-medium">Procesamiento en curso</p>
+                  <p className="text-blue-600">El backend está analizando el expediente. Esto puede tomar hasta 5 minutos.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {success.show && (
+            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div className="text-sm text-green-700">
+                  <p className="font-medium">Procesamiento completado exitosamente</p>
+                  <p className="text-green-600">
+                    El expediente <span className="font-mono font-medium">{success.expediente}</span> se procesó exitosamente en {success.processingTime} y ya se puede revisar en el{' '}
+                    <a 
+                      href={success.dashboardUrl} 
+                      className="text-green-800 hover:text-green-900 underline font-medium"
+                    >
+                      dashboard
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </form>
       </div>
 
