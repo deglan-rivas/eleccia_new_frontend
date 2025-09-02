@@ -35,7 +35,7 @@ export const RequisitosTabs: React.FC<RequisitosTabsProps> = ({ tabs, onEditRequ
                 aria-selected={activeTab === tab.id}
               >
                 {tab.nombre}
-                {tab.id === 'hoja_vida_candidatos' && tab.candidatos && (
+                {tab.id === '3' && tab.candidatos && (
                   <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                     {tab.candidatos.length}
                   </span>
@@ -55,7 +55,7 @@ export const RequisitosTabs: React.FC<RequisitosTabsProps> = ({ tabs, onEditRequ
             role="tabpanel"
             aria-labelledby={`${tab.id}-tab`}
           >
-            {tab.id === 'hoja_vida_candidatos' ? (
+            {tab.id === '3' ? (
               <>
                 <h4 className="font-semibold text-gray-800 mb-4">{tab.nombre}</h4>
                 <div className="space-y-4">
