@@ -18,6 +18,7 @@ export interface CandidatoData {
   dni: string;
   cargo: string;
   cumple: boolean;
+  candidatoStatus?: 'CUMPLE' | 'NO_CUMPLE' | 'ALERTA';
   requisitos: RequisitoData[];
 }
 

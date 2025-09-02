@@ -152,16 +152,34 @@ export const mapRequisitoData = (backendRequisito: BackendRequisitoData): Requis
 };
 
 /**
+ * Calculates candidate compliance status based on requirements
+ */
+export const calculateCandidatoStatus = (requisitos: RequisitoData[]): 'CUMPLE' | 'NO_CUMPLE' | 'ALERTA' => {
+  if (!requisitos || requisitos.length === 0) return 'CUMPLE';
+  
+  const hasNoCumple = requisitos.some(req => req.estado === 'NO_CUMPLE');
+  const hasAlerta = requisitos.some(req => req.estado === 'ALERTA');
+  
+  if (hasNoCumple) return 'NO_CUMPLE';
+  if (hasAlerta) return 'ALERTA';
+  return 'CUMPLE';
+};
+
+/**
  * Maps backend candidato data to frontend CandidatoData
  */
 export const mapCandidatoData = (backendCandidato: BackendCandidatoData): CandidatoData => {
+  const mappedRequisitos = (backendCandidato.requisitos || []).map(mapRequisitoData);
+  const candidatoStatus = calculateCandidatoStatus(mappedRequisitos);
+  
   return {
     dni: backendCandidato.dni || '',
     nombres: backendCandidato.nombres || '',
     apellidos: backendCandidato.apellidos || '',
     cargo: backendCandidato.cargo || '',
-    cumple: backendCandidato.cumple || false,
-    requisitos: (backendCandidato.requisitos || []).map(mapRequisitoData)
+    cumple: candidatoStatus === 'CUMPLE',
+    candidatoStatus,
+    requisitos: mappedRequisitos
   };
 };
 
