@@ -1,5 +1,6 @@
 import apiClient from '../config/axios';
 import { handleApiError } from '../utils/apiErrorHandler';
+import { type SelectOption } from '../types';
 
 export interface BackendParametroResponse {
   txanioeleccion: string;
@@ -32,6 +33,7 @@ export interface ParametroConfig {
   valor: string | number;
   obligatorio: boolean;
   step?: number;
+  opciones?: SelectOption[];
 }
 
 export interface ConfiguracionContexto {
@@ -203,16 +205,45 @@ class ParametrosService {
       let tipo: 'number' | 'select' | 'radio' | 'date' = 'number';
       let step: number | undefined;
 
-      // Determine parameter type based on value and key
-      if (typeof value === 'number') {
+      // Determine parameter type based on key name and value
+      if (key.toLowerCase().includes('fecha')) {
+        tipo = 'date';
+      } else if (key.toLowerCase().includes('modalidad')) {
+        tipo = 'select';
+      } else if (key.toLowerCase().includes('modo de aplicación') || key.toLowerCase().includes('modo de aplicacion')) {
+        tipo = 'select';
+      } else if (typeof value === 'number') {
         if (key.toLowerCase().includes('tasa') || key.toLowerCase().includes('monto')) {
           tipo = 'number';
           step = 0.01;
         } else {
           tipo = 'number';
         }
-      } else if (key.toLowerCase().includes('fecha')) {
-        tipo = 'date';
+      } else if (typeof value === 'string') {
+        // String values that represent options should be select/radio
+        if (value === 'afiliados' || value === 'delegados' || 
+            value === 'lista_completa' || value === 'cuerpo_lista') {
+          tipo = 'select';
+        } else {
+          // For other strings, default to number (might be converted values)
+          tipo = 'number';
+        }
+      }
+
+      // Define options for select/radio types
+      let opciones: SelectOption[] | undefined;
+      if (tipo === 'select') {
+        if (key.toLowerCase().includes('modalidad')) {
+          opciones = [
+            { value: 'afiliados', label: 'Afiliados' },
+            { value: 'delegados', label: 'Delegados' }
+          ];
+        } else if (key.toLowerCase().includes('modo de aplicación') || key.toLowerCase().includes('modo de aplicacion')) {
+          opciones = [
+            { value: 'lista_completa', label: 'Lista Completa' },
+            { value: 'cuerpo_lista', label: 'Cuerpo de Lista' }
+          ];
+        }
       }
 
       parametros.push({
@@ -221,7 +252,8 @@ class ParametrosService {
         tipo,
         valor: value as string | number,
         obligatorio: true,
-        step
+        step,
+        opciones
       });
     }
 
