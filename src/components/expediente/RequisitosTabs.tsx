@@ -20,7 +20,7 @@ export const RequisitosTabs: React.FC<RequisitosTabsProps> = ({ tabs, onEditRequ
     <div className="bg-white rounded-lg shadow-md max-w-5xl mx-auto mb-6">
       <div className="border-b border-gray-200">
         <ul className="flex overflow-x-auto" role="tablist">
-          {tabs.map((tab) => (
+          {tabs.sort((a, b) => a.id - b.id).map((tab) => (
             <li key={tab.id} className="mr-2">
               <button 
                 className={`inline-block p-4 border-b-2 transition-colors ${
