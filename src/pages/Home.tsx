@@ -154,15 +154,15 @@ export const Home: React.FC = () => {
       //   baseURL: BACKEND_URLS.CALIFICAR_EXPEDIENTE_BASE, // Override baseURL solo para esta petición
       //   timeout: 5 * 60 * 1000 // 5 minutos en milisegundos
       // });
-      await fakeBackendCall({}, 8400);
+      await fakeBackendCall({}, 68700);
       
       // Calcular tiempo de procesamiento
       const endTime = Date.now();
       const processingTimeMs = endTime - startTime;
-      const processingTimeSeconds = Math.round(processingTimeMs / 1000);
+      const processingTimeSeconds = processingTimeMs / 1000;
       const processingTimeFormatted = processingTimeSeconds < 60 
-        ? `${processingTimeSeconds} segundos`
-        : `${Math.round(processingTimeSeconds / 60)} minutos`;
+        ? `${processingTimeSeconds.toFixed(1)} segundos`
+        : `${(processingTimeSeconds / 60).toFixed(1)} minutos`;
       
       // Imprimir respuesta en consola
       // console.log('📋 Respuesta del backend:', response.data);
