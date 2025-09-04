@@ -158,9 +158,9 @@ class ParametrosService {
   private mapTipoRequisitoToCategory(tipoRequisito: number): string {
     switch (tipoRequisito) {
       case 1: return 'solicitud_inscripcion';
-      case 2: return 'acta_plazo';
-      case 3: return 'ddjj_de_conciencia';
-      case 4: return 'comprobante_de_pago';
+      case 2: return 'acta_eleccion_interna';
+      case 3: return 'hoja_vida_candidato';
+      case 4: return 'plan_gobierno';
       default: return 'otros';
     }
   }
