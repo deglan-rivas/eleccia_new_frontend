@@ -5,7 +5,7 @@ import { Input } from '../components/ui/Input';
 import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
 import { BACKEND_ENDPOINTS, BACKEND_URLS } from '../config/endpoints';
-import { fakeBackendCall } from '../utils/fakeBackendCall';
+import apiClient from '../config/axios';
 
 interface FormData {
   num_expediente: string;
@@ -150,11 +150,11 @@ export const Home: React.FC = () => {
       console.log('🚀 Enviando petición al backend:', `${BACKEND_URLS.CALIFICAR_EXPEDIENTE_BASE}${endpoint}`);
       
       // Realizar petición POST con timeout de 5 minutos (solo para esta petición)
-      // const response = await apiClient.post(endpoint, {}, {
-      //   baseURL: BACKEND_URLS.CALIFICAR_EXPEDIENTE_BASE, // Override baseURL solo para esta petición
-      //   timeout: 5 * 60 * 1000 // 5 minutos en milisegundos
-      // });
-      await fakeBackendCall({}, 68700);
+      const response = await apiClient.post(endpoint, {}, {
+        baseURL: BACKEND_URLS.CALIFICAR_EXPEDIENTE_BASE, // Override baseURL solo para esta petición
+        timeout: 5 * 60 * 1000 // 5 minutos en milisegundos
+      });
+      // await fakeBackendCall({}, 68700);
       
       // Calcular tiempo de procesamiento
       const endTime = Date.now();
@@ -165,7 +165,7 @@ export const Home: React.FC = () => {
         : `${(processingTimeSeconds / 60).toFixed(1)} minutos`;
       
       // Imprimir respuesta en consola
-      // console.log('📋 Respuesta del backend:', response.data);
+      console.log('📋 Respuesta del backend:', response.data);
       console.log('⏱️ Tiempo de procesamiento:', processingTimeFormatted);
       
       // Mostrar mensaje de éxito en lugar de toast
