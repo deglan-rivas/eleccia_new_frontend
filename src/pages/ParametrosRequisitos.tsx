@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Select } from '../components/ui/Select';
 import { Input } from '../components/ui/Input';
@@ -8,32 +8,10 @@ import { Button } from '../components/ui/Button';
 import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
 import { PARAMETROS_ENDPOINTS, buildUrl } from '../config/endpoints';
-// import { 
-//   ANOS_DISPONIBLES, 
-//   TIPOS_PROCESO_ELECTORAL, 
-//   TIPOS_ELECCION, 
-//   TIPOS_EXPEDIENTE, 
-//   TIPOS_MATERIA,
-//   REQUISITOS_ESPECIFICOS,
-//   PARAMETROS_MOCK,
-//   CATEGORIAS_REQUISITO,
-//   OPCIONES_OBLIGATORIEDAD,
-//   updateParametrosMock,
-//   type ParametroEvaluacion,
-//   type ParametroIndividual
-// } from '../constants/parametros';
+import parametrosService, { type FrontendParametrosStructure } from '../services/parametrosService';
 import { 
-  ANOS_DISPONIBLES, 
-  TIPOS_PROCESO_ELECTORAL, 
-  TIPOS_ELECCION, 
-  TIPOS_EXPEDIENTE, 
-  TIPOS_MATERIA,
-  REQUISITOS_ESPECIFICOS,
-  PARAMETROS_MOCK,
   CATEGORIAS_REQUISITO,
-  getConfiguracionContexto,
   updateConfiguracionContexto,
-  generarObjetoSalida,
   type ParametroEvaluacion,
   type ParametroIndividual
 } from '../constants/parametros.temp';
@@ -86,15 +64,57 @@ export const ParametrosRequisitos: React.FC = () => {
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingParametros, setIsLoadingParametros] = useState(true);
+  const [parametrosData, setParametrosData] = useState<FrontendParametrosStructure | null>(null);
   const { toast, showSuccess, showError, hideToast } = useToast();
 
-  // Efectos para la cascada de selección (mismo código anterior)
+  // Funciones auxiliares para manejar configuración dinámica
+  const getOptionsForYear = useCallback((ano: string) => {
+    return parametrosData?.ESTRUCTURA_POR_ANO?.[ano] || {
+      TIPOS_PROCESO_ELECTORAL: [],
+      TIPOS_ELECCION: [],
+      TIPOS_EXPEDIENTE: [],
+      TIPOS_MATERIA: [],
+      REQUISITOS_ESPECIFICOS: []
+    };
+  }, [parametrosData]);
+
+  const getConfiguracionFromDynamicData = useCallback((ano: string, contexto: ContextoSeleccion) => {
+    try {
+      return parametrosData?.ESTRUCTURA_POR_ANO?.[ano]?.CONFIGURACIONES?.[contexto.tipoProcesoElectoral]?.[contexto.tipoEleccion]?.[contexto.tipoExpediente]?.[contexto.tipoMateria]?.[contexto.requisitoEspecifico];
+    } catch {
+      return null;
+    }
+  }, [parametrosData]);
+
+  // Cargar parámetros dinámicos del backend al inicio
   useEffect(() => {
-    if (contexto.ano) {
-      const nuevasOpciones = TIPOS_PROCESO_ELECTORAL[contexto.ano] || [];
+    const loadParametros = async () => {
+      try {
+        setIsLoadingParametros(true);
+        const data = await parametrosService.getParametros();
+        console.log('Datos cargados del backend:', data);
+        setParametrosData(data);
+      } catch (error) {
+        console.error('Error loading parametros:', error);
+        showError('Error al cargar parámetros del backend');
+      } finally {
+        setIsLoadingParametros(false);
+      }
+    };
+
+    loadParametros();
+  }, [showError]);
+
+  // Efectos para la cascada de selección (usando datos dinámicos)
+  useEffect(() => {
+    if (contexto.ano && parametrosData) {
+      console.log('Año seleccionado:', contexto.ano);
+      const opcionesAno = getOptionsForYear(contexto.ano);
+      console.log('Opciones para año:', opcionesAno);
       setOpcionesDisponibles(prev => ({
         ...prev,
-        tiposProcesoElectoral: nuevasOpciones
+        tiposProcesoElectoral: opcionesAno.TIPOS_PROCESO_ELECTORAL
       }));
       
       setContexto(prev => ({
@@ -115,11 +135,12 @@ export const ParametrosRequisitos: React.FC = () => {
         requisitosEspecificos: []
       }));
     }
-  }, [contexto.ano]);
+  }, [contexto.ano, parametrosData, getOptionsForYear]);
 
   useEffect(() => {
-    if (contexto.tipoProcesoElectoral) {
-      const nuevasOpciones = TIPOS_ELECCION[contexto.tipoProcesoElectoral] || [];
+    if (contexto.tipoProcesoElectoral && parametrosData && contexto.ano) {
+      const opcionesAno = getOptionsForYear(contexto.ano);
+      const nuevasOpciones = opcionesAno.TIPOS_ELECCION || [];
       setOpcionesDisponibles(prev => ({
         ...prev,
         tiposEleccion: nuevasOpciones
@@ -141,11 +162,12 @@ export const ParametrosRequisitos: React.FC = () => {
         requisitosEspecificos: []
       }));
     }
-  }, [contexto.tipoProcesoElectoral]);
+  }, [contexto.tipoProcesoElectoral, contexto.ano, parametrosData, getOptionsForYear]);
 
   useEffect(() => {
-    if (contexto.tipoEleccion) {
-      const nuevasOpciones = TIPOS_EXPEDIENTE[contexto.tipoEleccion] || [];
+    if (contexto.tipoEleccion && parametrosData && contexto.ano) {
+      const opcionesAno = getOptionsForYear(contexto.ano);
+      const nuevasOpciones = opcionesAno.TIPOS_EXPEDIENTE || [];
       setOpcionesDisponibles(prev => ({
         ...prev,
         tiposExpediente: nuevasOpciones
@@ -165,11 +187,12 @@ export const ParametrosRequisitos: React.FC = () => {
         requisitosEspecificos: []
       }));
     }
-  }, [contexto.tipoEleccion]);
+  }, [contexto.tipoEleccion, contexto.ano, parametrosData, getOptionsForYear]);
 
   useEffect(() => {
-    if (contexto.tipoExpediente) {
-      const nuevasOpciones = TIPOS_MATERIA[contexto.tipoExpediente] || [];
+    if (contexto.tipoExpediente && parametrosData && contexto.ano) {
+      const opcionesAno = getOptionsForYear(contexto.ano);
+      const nuevasOpciones = opcionesAno.TIPOS_MATERIA || [];
       setOpcionesDisponibles(prev => ({
         ...prev,
         tiposMateria: nuevasOpciones
@@ -187,11 +210,12 @@ export const ParametrosRequisitos: React.FC = () => {
         requisitosEspecificos: []
       }));
     }
-  }, [contexto.tipoExpediente]);
+  }, [contexto.tipoExpediente, contexto.ano, parametrosData, getOptionsForYear]);
 
   useEffect(() => {
-    if (contexto.tipoMateria) {
-      const nuevasOpciones = REQUISITOS_ESPECIFICOS[contexto.tipoMateria] || [];
+    if (contexto.tipoMateria && parametrosData && contexto.ano) {
+      const opcionesAno = getOptionsForYear(contexto.ano);
+      const nuevasOpciones = opcionesAno.REQUISITOS_ESPECIFICOS || [];
       setOpcionesDisponibles(prev => ({
         ...prev,
         requisitosEspecificos: nuevasOpciones
@@ -207,37 +231,45 @@ export const ParametrosRequisitos: React.FC = () => {
         requisitosEspecificos: []
       }));
     }
-  }, [contexto.tipoMateria]);
+  }, [contexto.tipoMateria, contexto.ano, parametrosData, getOptionsForYear]);
 
   // Efecto para autocompletar parámetros cuando se selecciona un requisito específico
   useEffect(() => {
-    if (contexto.requisitoEspecifico && PARAMETROS_MOCK[contexto.requisitoEspecifico]) {
-      const parametrosMock = PARAMETROS_MOCK[contexto.requisitoEspecifico];
-      
+    if (contexto.requisitoEspecifico && parametrosData) {
       // Verificar si todos los campos del contexto están completos
       const contextoCompleto = contexto.ano && contexto.tipoProcesoElectoral && 
                               contexto.tipoEleccion && contexto.tipoExpediente && 
                               contexto.tipoMateria && contexto.requisitoEspecifico;
       
       if (contextoCompleto) {
-        // Obtener configuración específica del contexto
-        const configuracionContexto = getConfiguracionContexto(contexto);
+        // Obtener configuración específica del contexto desde datos dinámicos
+        const configuracionContexto = getConfiguracionFromDynamicData(contexto.ano, contexto);
         
-        setParametros({
-          ...parametrosMock,
-          parametrosValues: configuracionContexto.parametrosValues
-        });
-      } else {
-        // Si el contexto no está completo, usar valores por defecto
-        const parametrosValues: Record<string, string | number> = {};
-        parametrosMock.parametros.forEach(param => {
-          parametrosValues[param.nombre] = param.valor;
-        });
-        
-        setParametros({
-          ...parametrosMock,
-          parametrosValues
-        });
+        if (configuracionContexto) {
+          const parametrosValues: Record<string, string | number> = {};
+          (configuracionContexto.parametros || []).forEach(param => {
+            parametrosValues[param.nombre] = param.valor;
+          });
+          
+          setParametros({
+            categoriaRequisito: configuracionContexto.categoriaRequisito,
+            descripcionRequisito: configuracionContexto.descripcion,
+            obligatoriedad: configuracionContexto.habilitado ? 'obligatorio' : 'opcional',
+            nombreCriterio: 'cuerpo_lista',
+            parametros: configuracionContexto.parametros || [],
+            parametrosValues
+          });
+        } else {
+          // No hay configuración para este contexto
+          setParametros({
+            categoriaRequisito: '',
+            descripcionRequisito: '',
+            obligatoriedad: 'obligatorio',
+            nombreCriterio: 'cuerpo_lista',
+            parametros: [],
+            parametrosValues: {}
+          });
+        }
       }
     } else {
       setParametros({
@@ -249,7 +281,7 @@ export const ParametrosRequisitos: React.FC = () => {
         parametrosValues: {}
       });
     }
-  }, [contexto]);
+  }, [contexto, parametrosData, getConfiguracionFromDynamicData]);
 
   const handleContextoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -311,6 +343,72 @@ export const ParametrosRequisitos: React.FC = () => {
     return true;
   };
 
+  const generarObjetoSalida = (contexto: ContextoSeleccion, parametrosValues: Record<string, string | number>, parametros: ParametrosFormulario) => {
+    if (!parametrosData || !contexto.ano) {
+      throw new Error('Datos de parámetros no disponibles');
+    }
+
+    const opcionesAno = getOptionsForYear(contexto.ano);
+    
+    // Debug: log what we're trying to match
+    console.log('🔍 Contexto a buscar:', {
+      ano: contexto.ano,
+      tipoProcesoElectoral: contexto.tipoProcesoElectoral,
+      tipoEleccion: contexto.tipoEleccion,
+      tipoExpediente: contexto.tipoExpediente,
+      tipoMateria: contexto.tipoMateria,
+      requisitoEspecifico: contexto.requisitoEspecifico
+    });
+    
+    // Debug: log available options
+    console.log('📋 Opciones disponibles:', {
+      TIPOS_PROCESO_ELECTORAL: opcionesAno.TIPOS_PROCESO_ELECTORAL,
+      TIPOS_ELECCION: opcionesAno.TIPOS_ELECCION,
+      TIPOS_EXPEDIENTE: opcionesAno.TIPOS_EXPEDIENTE,
+      TIPOS_MATERIA: opcionesAno.TIPOS_MATERIA,
+      REQUISITOS_ESPECIFICOS: opcionesAno.REQUISITOS_ESPECIFICOS
+    });
+    
+    // Find the correct IDs based on the selected values (IDs stored in context)
+    console.log('🔎 Buscando tipoProceso por value:', contexto.tipoProcesoElectoral, 'en:', opcionesAno.TIPOS_PROCESO_ELECTORAL.map(tp => tp.value));
+    const tipoProceso = opcionesAno.TIPOS_PROCESO_ELECTORAL.find(tp => tp.value === contexto.tipoProcesoElectoral);
+    
+    console.log('🔎 Buscando tipoEleccion por value:', contexto.tipoEleccion, 'en:', opcionesAno.TIPOS_ELECCION.map(te => te.value));
+    const tipoEleccion = opcionesAno.TIPOS_ELECCION.find(te => te.value === contexto.tipoEleccion);
+    
+    console.log('🔎 Buscando tipoExpediente por value:', contexto.tipoExpediente, 'en:', opcionesAno.TIPOS_EXPEDIENTE.map(texp => texp.value));
+    const tipoExpediente = opcionesAno.TIPOS_EXPEDIENTE.find(texp => texp.value === contexto.tipoExpediente);
+    
+    console.log('🔎 Buscando tipoMateria por value:', contexto.tipoMateria, 'en:', opcionesAno.TIPOS_MATERIA.map(tm => tm.value));
+    const tipoMateria = opcionesAno.TIPOS_MATERIA.find(tm => tm.value === contexto.tipoMateria);
+    
+    const requisitoEspecifico = opcionesAno.REQUISITOS_ESPECIFICOS.find(re => re.value === contexto.requisitoEspecifico);
+    
+    console.log('🔍 Resultados de búsqueda:', {
+      tipoProceso,
+      tipoEleccion,
+      tipoExpediente,
+      tipoMateria,
+      requisitoEspecifico
+    });
+
+    if (!tipoProceso || !tipoEleccion || !tipoExpediente || !tipoMateria || !requisitoEspecifico) {
+      throw new Error('No se pudieron encontrar los IDs correspondientes para la configuración seleccionada');
+    }
+
+    return {
+      ANIO: parseInt(contexto.ano),
+      TIPO_PROCESO: parseInt(tipoProceso.value),
+      TIPO_ELECCION: parseInt(tipoEleccion.value),
+      ID_TIPO_EXPEDIENTE: parseInt(tipoExpediente.value),
+      ID_MATERIA: parseInt(tipoMateria.value),
+      ID_REQUISITO: parseInt(requisitoEspecifico.value),
+      TIPO_REQUISITO: 1, // Default value, might need to be derived from backend data
+      DESCRIPCION: parametros.descripcionRequisito,
+      CONF_PARAM: Object.keys(parametrosValues).length > 0 ? parametrosValues : {}
+    };
+  };
+
   const handleSaveConfiguration = async () => {
     if (!isFormValid()) return;
     
@@ -348,7 +446,8 @@ export const ParametrosRequisitos: React.FC = () => {
       console.log('📋 Configuración guardada:', objetoSalida);
       
       // Mostrar mensaje de éxito con Toast
-      const requistoLabel = REQUISITOS_ESPECIFICOS[contexto.tipoMateria]?.find(r => r.value === contexto.requisitoEspecifico)?.label;
+      const opcionesAno = getOptionsForYear(contexto.ano);
+      const requistoLabel = opcionesAno.REQUISITOS_ESPECIFICOS?.find(r => r.value === contexto.requisitoEspecifico)?.label;
       const parametrosInfo = parametros.parametros.length > 0 ? 
         `con ${parametros.parametros.length} parámetro(s) configurado(s)` : 
         'sin parámetros configurables (EleccIA maneja la validación internamente)';
@@ -438,6 +537,25 @@ export const ParametrosRequisitos: React.FC = () => {
     }
   };
 
+  if (isLoadingParametros) {
+    return (
+      <div className="flex justify-center items-center min-h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-jne-red"></div>
+      </div>
+    );
+  }
+
+  if (!parametrosData) {
+    return (
+      <div className="max-w-5xl mx-auto mt-8">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+          <strong className="font-bold">Error al cargar parámetros</strong>
+          <p className="text-sm mt-1">No se pudieron cargar los parámetros desde el backend.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -467,9 +585,10 @@ export const ParametrosRequisitos: React.FC = () => {
               name="ano"
               value={contexto.ano}
               onChange={handleContextoChange}
-              options={ANOS_DISPONIBLES}
+              options={parametrosData?.ANOS_DISPONIBLES || []}
               placeholder="Seleccione el año"
               required
+              disabled={isLoadingParametros}
             />
 
             <Select

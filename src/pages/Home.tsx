@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import apiClient from '../config/axios';
 import { Alert } from '../components/ui/Alert';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
 import { BACKEND_ENDPOINTS, BACKEND_URLS } from '../config/endpoints';
+import { fakeBackendCall } from '../utils/fakeBackendCall';
 
 interface FormData {
   num_expediente: string;
@@ -154,22 +154,6 @@ export const Home: React.FC = () => {
       //   baseURL: BACKEND_URLS.CALIFICAR_EXPEDIENTE_BASE, // Override baseURL solo para esta petición
       //   timeout: 5 * 60 * 1000 // 5 minutos en milisegundos
       // });
-      const fakeBackendCall = (data = {}, delay = 2000) => {
-        return new Promise((resolve, reject) => {
-          // Simula éxito
-          setTimeout(() => {
-            resolve({
-              status: 200,
-              message: "Simulación de respuesta exitosa",
-              data
-            });
-          }, delay);
-
-          // (Opcional) puedes agregar lógica para simular error:
-          // setTimeout(() => reject(new Error("Error simulado")), delay);
-        });
-      };
-
       await fakeBackendCall({}, 8400);
       
       // Calcular tiempo de procesamiento
