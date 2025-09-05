@@ -135,7 +135,7 @@ export const InformeModal: React.FC<InformeModalProps> = ({ isOpen, onClose, exp
           </div>
 
           {/* Descripción de la Resolución */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h4 className="text-md font-semibold text-gray-700 mb-3">Descripción de la Resolución</h4>
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="mb-3">
@@ -154,7 +154,7 @@ export const InformeModal: React.FC<InformeModalProps> = ({ isOpen, onClose, exp
                 />
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
