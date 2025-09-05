@@ -23,7 +23,7 @@ export const AUTH_ENDPOINTS = {
  */
 export const EXPEDIENTE_ENDPOINTS = {
   GET_DETAIL: '/expediente/analisis',
-  SAVE_CHANGES: '/guardar_cambios_requisitos',
+  SAVE_CHANGES: '/expediente/edita_calicacion',
   GENERATE_RESOLUTION: '/generar_resolucion',
   LIST_RESOLUCIONES: '/listado_resoluciones_expediente'
 } as const;

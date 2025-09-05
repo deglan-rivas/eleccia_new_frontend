@@ -7,10 +7,13 @@ import { ActionButtons } from '../components/buttons/ActionButtons';
 import { EditRequisitoModal } from '../components/modals/EditRequisitoModal';
 import { NormativasModal } from '../components/modals/NormativasModal';
 import { type SelectedNormativas } from '../types/normativa';
+import { Toast } from '../components/ui/Toast';
+import { useToast } from '../hooks/useToast';
 import expedienteService from '../services/expedienteService';
 
 export const ExpedienteDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { toast, showError, hideToast } = useToast();
   const [expediente, setExpediente] = useState<ExpedienteDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -751,7 +754,7 @@ export const ExpedienteDetail: React.FC = () => {
     } catch (error) {
       console.error('Error saving requisito:', error);
       const errorMessage = error instanceof Error ? error.message : 'Error al guardar el requisito';
-      alert(`Error: ${errorMessage}`);
+      showError(errorMessage);
     }
   };
 
@@ -992,6 +995,15 @@ export const ExpedienteDetail: React.FC = () => {
         isOpen={isNormativasModalOpen}
         onClose={() => setIsNormativasModalOpen(false)}
         onConfirm={handleConfirmNormativas}
+      />
+
+      {/* Toast para notificaciones */}
+      <Toast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={hideToast}
+        duration={4000}
       />
     </>
   );

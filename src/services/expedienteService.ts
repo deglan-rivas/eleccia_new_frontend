@@ -94,19 +94,23 @@ class ExpedienteService {
   async saveRequisito(
     idExpediente: string,
     requisitoId: string,
-    estado: string,
+    _estado: string,
     observacion: string
   ): Promise<SaveRequisitoResponse> {
     try {
-      const formData = new FormData();
-      formData.append('id_expediente', idExpediente);
-      formData.append(`requisito_${requisitoId}`, estado);
-      if (observacion) {
-        formData.append(`observacion_${requisitoId}`, observacion);
+      // Validate observacion is not empty after trimming
+      const trimmedObservacion = observacion.trim();
+      if (!trimmedObservacion) {
+        throw new Error('La observación no puede estar vacía');
       }
 
+      const formData = new FormData();
+      formData.append('id_expediente', idExpediente);
+      formData.append('id_requisito', requisitoId);
+      formData.append('observacion', trimmedObservacion);
+
       const response = await apiClient.post<SaveRequisitoResponse>(
-        '/guardar_cambios_requisitos',
+        '/expediente/edita_calicacion',
         formData,
         {
           headers: {
@@ -141,7 +145,7 @@ class ExpedienteService {
       });
 
       const response = await apiClient.post<SaveRequisitoResponse>(
-        '/guardar_cambios_requisitos',
+        '/expediente/edita_calicacion',
         formData,
         {
           headers: {
