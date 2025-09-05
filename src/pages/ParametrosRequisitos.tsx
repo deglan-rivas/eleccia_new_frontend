@@ -11,6 +11,7 @@ import { PARAMETROS_ENDPOINTS, buildUrl } from '../config/endpoints';
 import parametrosService, { type FrontendParametrosStructure } from '../services/parametrosService';
 import { 
   CATEGORIAS_REQUISITO,
+  ID_MAPPINGS,
   updateConfiguracionContexto,
   type ParametroEvaluacion,
   type ParametroIndividual
@@ -396,6 +397,12 @@ export const ParametrosRequisitos: React.FC = () => {
       throw new Error('No se pudieron encontrar los IDs correspondientes para la configuración seleccionada');
     }
 
+    // Get the TIPO_REQUISITO ID from the selected category
+    const tipoRequisitoId = ID_MAPPINGS.CATEGORIAS_REQUISITO[parametros.categoriaRequisito as keyof typeof ID_MAPPINGS.CATEGORIAS_REQUISITO];
+    
+    console.log('🔍 Mapping categoriaRequisito:', parametros.categoriaRequisito, 'to ID:', tipoRequisitoId);
+    console.log('parametros: ', parametros)
+    
     return {
       ANIO: parseInt(contexto.ano),
       TIPO_PROCESO: parseInt(tipoProceso.value),
@@ -403,7 +410,7 @@ export const ParametrosRequisitos: React.FC = () => {
       ID_TIPO_EXPEDIENTE: parseInt(tipoExpediente.value),
       ID_MATERIA: parseInt(tipoMateria.value),
       ID_REQUISITO: parseInt(requisitoEspecifico.value),
-      TIPO_REQUISITO: 1, // Default value, might need to be derived from backend data
+      TIPO_REQUISITO: tipoRequisitoId,
       DESCRIPCION: parametros.descripcionRequisito,
       CONF_PARAM: Object.keys(parametrosValues).length > 0 ? parametrosValues : {}
     };
@@ -415,13 +422,14 @@ export const ParametrosRequisitos: React.FC = () => {
     setIsSaving(true);
     try {
       // Simular delay de red
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Actualizar la configuración en el contexto jerárquico
       updateConfiguracionContexto(contexto, parametros.parametrosValues);
       
       // Generar objeto de salida según especificaciones
       const objetoSalida = generarObjetoSalida(contexto, parametros.parametrosValues, parametros);
+      console.log('objetoSalida: ',objetoSalida)
       
       // Enviar JSON al backend
       let backendSuccess = false;

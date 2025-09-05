@@ -12,6 +12,7 @@ interface FilterData {
   fecha_desde: string;
   fecha_hasta: string;
   estado: string;
+  [key: string]: string | number;
 }
 
 // Use types from the service
