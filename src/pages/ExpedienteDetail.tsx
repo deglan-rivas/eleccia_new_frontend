@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { type ExpedienteDetailData, type RequisitoData } from '../types/expediente';
+import { type ExpedienteDetailData, type RequisitoData, type TabData, type CandidatoData } from '../types/expediente';
 import { InformeModal } from '../components/expediente/InformeModal';
 import { RequisitosTabs } from '../components/expediente/RequisitosTabs';
 import { ActionButtons } from '../components/buttons/ActionButtons';
@@ -23,6 +23,8 @@ export const ExpedienteDetail: React.FC = () => {
   const [isEditRequisitoModalOpen, setIsEditRequisitoModalOpen] = useState(false);
   const [requisitoToEdit, setRequisitoToEdit] = useState<RequisitoData | null>(null);
   const [isNormativasModalOpen, setIsNormativasModalOpen] = useState(false);
+  const [originalExpediente, setOriginalExpediente] = useState<ExpedienteDetailData | null>(null);
+  const [temporaryChanges, setTemporaryChanges] = useState<Map<string, Partial<RequisitoData>>>(new Map());
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -34,6 +36,8 @@ export const ExpedienteDetail: React.FC = () => {
       try {
         const data = await expedienteService.getExpedienteDetail(id);
         setExpediente(data);
+        // Store original data for restoration
+        setOriginalExpediente(data);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Error al cargar los datos del expediente';
         setError(errorMessage);
@@ -656,6 +660,8 @@ export const ExpedienteDetail: React.FC = () => {
         };
         
         setExpediente(mockData);
+        // Store original data for restoration
+        setOriginalExpediente(mockData);
         }
       } finally {
         setLoading(false);
@@ -727,6 +733,16 @@ export const ExpedienteDetail: React.FC = () => {
     }
   };
 
+  const handleCancelEdit = () => {
+    // Restore original expediente state
+    if (originalExpediente) {
+      setExpediente(originalExpediente);
+      setTemporaryChanges(new Map());
+      setHasChanges(false);
+      setEditMode(false);
+    }
+  };
+
   const handleSaveChanges = async () => {
     // TODO: Implement save functionality
     console.log('Saving changes...');
@@ -737,6 +753,39 @@ export const ExpedienteDetail: React.FC = () => {
         resolve();
       }, 1000);
     });
+  };
+
+  // Helper function to apply temporary changes to expediente
+  const applyTemporaryChanges = (baseExpediente: ExpedienteDetailData, changes: Map<string, Partial<RequisitoData>>): ExpedienteDetailData => {
+    if (changes.size === 0) return baseExpediente;
+    
+    const updatedExpediente = JSON.parse(JSON.stringify(baseExpediente));
+    
+    updatedExpediente.tabs.forEach((tab: TabData) => {
+      if (tab.requisitos) {
+        tab.requisitos.forEach((requisito: RequisitoData, index: number) => {
+          const changeKey = `${tab.id}_${requisito.id_estado_requisito}`;
+          const change = changes.get(changeKey);
+          if (change) {
+            tab.requisitos![index] = { ...requisito, ...change };
+          }
+        });
+      }
+      
+      if (tab.candidatos) {
+        tab.candidatos.forEach((candidato: CandidatoData) => {
+          candidato.requisitos.forEach((requisito: RequisitoData, index: number) => {
+            const changeKey = `${tab.id}_${candidato.dni}_${requisito.id_estado_requisito}`;
+            const change = changes.get(changeKey);
+            if (change) {
+              candidato.requisitos[index] = { ...requisito, ...change };
+            }
+          });
+        });
+      }
+    });
+    
+    return updatedExpediente;
   };
 
   const handleSaveRequisito = async (requisitoId: string, estado: string, observacion: string) => {
@@ -754,14 +803,82 @@ export const ExpedienteDetail: React.FC = () => {
         return; // Don't close modal or set changes if inappropriate
       }
       
-      // Content is appropriate - show success and close modal
+      // Content is appropriate - show success, apply temporary changes, and close modal
       showSuccess('Observación guardada correctamente');
+      
+      // Create temporary changes for visual update
+      const newChanges = new Map(temporaryChanges);
+      
+      // Find which tab and context this requisito belongs to
+      let changeKey = '';
+      if (expediente && requisitoToEdit) {
+        for (const tab of expediente.tabs) {
+          // Check direct requisitos
+          if (tab.requisitos?.some(req => req.id_estado_requisito === requisitoToEdit.id_estado_requisito)) {
+            changeKey = `${tab.id}_${requisitoToEdit.id_estado_requisito}`;
+            break;
+          }
+          // Check candidatos requisitos
+          for (const candidato of tab.candidatos || []) {
+            if (candidato.requisitos?.some(req => req.id_estado_requisito === requisitoToEdit.id_estado_requisito)) {
+              changeKey = `${tab.id}_${candidato.dni}_${requisitoToEdit.id_estado_requisito}`;
+              break;
+            }
+          }
+          if (changeKey) break;
+        }
+      }
+      
+      if (changeKey) {
+        // Map frontend estado to display values
+        const getEstadoVisualProps = (estado: string) => {
+          switch (estado) {
+            case 'CUMPLE':
+              return {
+                estado: 'CUMPLE' as const,
+                estado_texto: 'Cumple',
+                estado_color: 'green' as const
+              };
+            case 'NO_CUMPLE':
+              return {
+                estado: 'NO_CUMPLE' as const,
+                estado_texto: 'No Cumple', 
+                estado_color: 'red' as const
+              };
+            case 'ALERTA':
+              return {
+                estado: 'ALERTA' as const,
+                estado_texto: 'Alerta',
+                estado_color: 'yellow' as const
+              };
+            default:
+              return {
+                estado: 'ALERTA' as const,
+                estado_texto: 'Alerta',
+                estado_color: 'yellow' as const
+              };
+          }
+        };
+        
+        const visualProps = getEstadoVisualProps(estado);
+        
+        newChanges.set(changeKey, {
+          ...visualProps,
+          observacion: observacion.trim(),
+          metodo_validacion: 'Validado por USUARIO'
+        });
+        
+        setTemporaryChanges(newChanges);
+        
+        // Apply changes to current expediente display
+        if (originalExpediente) {
+          const updatedExpediente = applyTemporaryChanges(originalExpediente, newChanges);
+          setExpediente(updatedExpediente);
+        }
+      }
+      
       setHasChanges(true);
       setIsEditRequisitoModalOpen(false);
-      
-      // Optionally refresh the expediente data to show updated changes
-      // const updatedData = await expedienteService.getExpedienteDetail(id);
-      // setExpediente(updatedData);
       
     } catch (error) {
       console.error('Error saving requisito:', error);
@@ -982,6 +1099,7 @@ export const ExpedienteDetail: React.FC = () => {
         expedienteId={id || ''}
         onEditModeToggle={handleEditModeToggle}
         onSaveChanges={handleSaveChanges}
+        onCancelEdit={handleCancelEdit}
         onGenerateResolution={handleGenerateResolution}
         editMode={editMode}
         hasChanges={hasChanges}

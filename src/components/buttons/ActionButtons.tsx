@@ -6,6 +6,7 @@ interface ActionButtonsProps {
   expedienteId: string;
   onEditModeToggle?: (editMode: boolean) => void;
   onSaveChanges?: () => Promise<void>;
+  onCancelEdit?: () => void;
   onGenerateResolution?: () => void;
   editMode?: boolean;
   hasChanges?: boolean;
@@ -15,6 +16,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   expedienteId,
   onEditModeToggle,
   onSaveChanges,
+  onCancelEdit,
   onGenerateResolution,
   editMode = false,
   hasChanges = false
@@ -48,7 +50,9 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   };
 
   const handleCancelEdit = () => {
-    if (onEditModeToggle) {
+    if (onCancelEdit) {
+      onCancelEdit();
+    } else if (onEditModeToggle) {
       onEditModeToggle(false);
     }
   };
