@@ -296,6 +296,8 @@ export const Home: React.FC = () => {
                     El expediente <span className="font-mono font-medium">{success.expediente}</span> se procesó exitosamente en {success.processingTime} y ya se puede revisar en el{' '}
                     <a 
                       href={success.dashboardUrl} 
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-green-800 hover:text-green-900 underline font-medium"
                     >
                       dashboard
