@@ -147,6 +147,8 @@ export const Dashboard: React.FC = () => {
     );
   }
 
+  // console.log('dashboardData.procesos: ', dashboardData.procesos)
+
   return (
     <>
       <div className="text-center mb-6">
@@ -271,7 +273,7 @@ export const Dashboard: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex space-x-2">
                       <Link 
-                        to={`/expediente/${proceso.id_expediente}`}
+                        to={`/expediente/${proceso.nombre_expediente}`}
                         className="text-blue-600 hover:text-blue-900 p-1 rounded-full hover:bg-blue-50"
                         title="Ver análisis"
                       >
