@@ -27,6 +27,23 @@ export interface SaveRequisitoRequest {
   observacion: string;
 }
 
+// Bulk save interfaces
+export interface BulkSaveRequisitoItem {
+  requisitoId: string;
+  estado: string;
+  observacion: string;
+}
+
+export interface BulkSaveRequisitoRequest {
+  cambios: BulkSaveRequisitoItem[];
+}
+
+export interface BulkSaveRequisitoResponse {
+  success: boolean;
+  message: string;
+  cambiosGuardados: number;
+}
+
 // Backend response interface
 interface BackendSaveRequisitoResponse {
   success: boolean;
@@ -154,7 +171,32 @@ class ExpedienteService {
   }
 
   /**
-   * Save multiple requisito changes
+   * Save multiple requisito changes in bulk
+   */
+  async saveBulkRequisitos(cambios: BulkSaveRequisitoItem[]): Promise<BulkSaveRequisitoResponse> {
+    try {
+      const requestBody: BulkSaveRequisitoRequest = { cambios };
+
+      const response = await apiClient.post<BulkSaveRequisitoResponse>(
+        '/expediente/guardar_cambios_calicacion',
+        requestBody,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          timeout: 30000 // 30 seconds timeout for bulk operations
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error('Error saving bulk requisitos:', error);
+      throw handleApiError(error);
+    }
+  }
+
+  /**
+   * Save multiple requisito changes (legacy method)
    */
   async saveMultipleRequisitos(
     idExpediente: string,

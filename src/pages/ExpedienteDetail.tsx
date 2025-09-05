@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { type ExpedienteDetailData, type RequisitoData, type TabData, type CandidatoData } from '../types/expediente';
 import { InformeModal } from '../components/expediente/InformeModal';
 import { RequisitosTabs } from '../components/expediente/RequisitosTabs';
@@ -9,10 +9,11 @@ import { NormativasModal } from '../components/modals/NormativasModal';
 import { type SelectedNormativas } from '../types/normativa';
 import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
-import expedienteService from '../services/expedienteService';
+import expedienteService, { type BulkSaveRequisitoItem } from '../services/expedienteService';
 
 export const ExpedienteDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { toast, showError, showSuccess, hideToast } = useToast();
   const [expediente, setExpediente] = useState<ExpedienteDetailData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,6 +26,8 @@ export const ExpedienteDetail: React.FC = () => {
   const [isNormativasModalOpen, setIsNormativasModalOpen] = useState(false);
   const [originalExpediente, setOriginalExpediente] = useState<ExpedienteDetailData | null>(null);
   const [temporaryChanges, setTemporaryChanges] = useState<Map<string, Partial<RequisitoData>>>(new Map());
+  const [pendingChanges, setPendingChanges] = useState<Map<string, { requisitoId: string; estado: string; observacion: string }>>(new Map());
+  const [isBulkSaving, setIsBulkSaving] = useState(false);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -738,21 +741,56 @@ export const ExpedienteDetail: React.FC = () => {
     if (originalExpediente) {
       setExpediente(originalExpediente);
       setTemporaryChanges(new Map());
+      setPendingChanges(new Map());
       setHasChanges(false);
       setEditMode(false);
     }
   };
 
   const handleSaveChanges = async () => {
-    // TODO: Implement save functionality
-    console.log('Saving changes...');
-    // Simulate API call
-    return new Promise<void>((resolve) => {
+    if (!id || pendingChanges.size === 0) {
+      console.warn('No changes to save');
+      return;
+    }
+
+    try {
+      setIsBulkSaving(true);
+      // Convert pending changes to bulk save format
+      const cambios: BulkSaveRequisitoItem[] = Array.from(pendingChanges.values()).map(change => ({
+        requisitoId: change.requisitoId,
+        estado: change.estado,
+        observacion: change.observacion
+      }));
+
+      console.log('Guardando cambios masivos:', cambios);
+
+      // Perform bulk save
+      const response = await expedienteService.saveBulkRequisitos(cambios);
+      
+      console.log('Respuesta del bulk save:', response);
+
+      // Show success message
+      showSuccess(`${response.cambiosGuardados} cambios guardados exitosamente`);
+
+      // Clear temporary state
+      setTemporaryChanges(new Map());
+      setPendingChanges(new Map());
+      setHasChanges(false);
+      setEditMode(false);
+
+      // Refresh the current page by navigating to it again
       setTimeout(() => {
-        setHasChanges(false);
-        resolve();
-      }, 1000);
-    });
+        navigate(`/expediente/${id}`, { replace: true });
+        // Force a page reload to get fresh data
+        window.location.reload();
+      }, 1500); // Small delay to show success message
+
+    } catch (error) {
+      console.error('Error saving bulk changes:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error al guardar los cambios';
+      showError(errorMessage);
+      setIsBulkSaving(false);
+    }
   };
 
   // Helper function to apply temporary changes to expediente
@@ -804,7 +842,7 @@ export const ExpedienteDetail: React.FC = () => {
       }
       
       // Content is appropriate - show success, apply temporary changes, and close modal
-      showSuccess('Observación guardada correctamente');
+      showSuccess('Requisito editado correctamente');
       
       // Create temporary changes for visual update
       const newChanges = new Map(temporaryChanges);
@@ -869,6 +907,15 @@ export const ExpedienteDetail: React.FC = () => {
         });
         
         setTemporaryChanges(newChanges);
+        
+        // Track pending changes for bulk save
+        const newPendingChanges = new Map(pendingChanges);
+        newPendingChanges.set(changeKey, {
+          requisitoId: requisitoToEdit!.id_estado_requisito, // Non-null assertion since we already checked above
+          estado: estado,
+          observacion: observacion.trim()
+        });
+        setPendingChanges(newPendingChanges);
         
         // Apply changes to current expediente display
         if (originalExpediente) {
@@ -1104,6 +1151,21 @@ export const ExpedienteDetail: React.FC = () => {
         editMode={editMode}
         hasChanges={hasChanges}
       />
+
+      {/* Loading indicator for bulk save */}
+      {isBulkSaving && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm mx-4">
+            <div className="flex items-center space-x-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-jne-red"></div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-800">Guardando cambios</h3>
+                <p className="text-sm text-gray-600">Esto puede tardar entre unos segundos...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal de Informe Completo */}
       <InformeModal
