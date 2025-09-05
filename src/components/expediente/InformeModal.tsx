@@ -71,7 +71,7 @@ export const InformeModal: React.FC<InformeModalProps> = ({ isOpen, onClose, exp
               <div key={tab.id} className="mb-4">
                 <div className="flex justify-between items-center mb-2">
                   <h5 className="text-sm font-medium text-gray-600">{tab.nombre}</h5>
-                  {tab.id === 'hoja_vida_candidatos' ? (
+                  {tab.id === '3' ? (
                     <div className="flex items-center">
                       {/* Candidate requirements count logic would go here */}
                     </div>
@@ -90,7 +90,7 @@ export const InformeModal: React.FC<InformeModalProps> = ({ isOpen, onClose, exp
                   )}
                 </div>
                 <div className="space-y-2">
-                  {tab.id === 'hoja_vida_candidatos' ? (
+                  {tab.id === '3' ? (
                     <>
                       {tab.candidatos?.map((candidato, candidatoIndex) => (
                         <div key={candidatoIndex} className="bg-gray-50 p-3 rounded-lg">
