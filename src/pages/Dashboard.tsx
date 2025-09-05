@@ -70,10 +70,12 @@ export const Dashboard: React.FC = () => {
 
   const getEstadoBadgeClass = (estado: string) => {
     switch (estado) {
-      case 'COMPLETADO':
+      case 'Completado':
         return 'bg-green-100 text-green-800';
-      case 'EN_PROCESO':
+      case 'En Proceso':
         return 'bg-yellow-100 text-yellow-800';
+      case 'Pendiente':
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
