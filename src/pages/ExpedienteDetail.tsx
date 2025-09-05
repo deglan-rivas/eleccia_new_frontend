@@ -13,7 +13,7 @@ import expedienteService from '../services/expedienteService';
 
 export const ExpedienteDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { toast, showError, hideToast } = useToast();
+  const { toast, showError, showSuccess, hideToast } = useToast();
   const [expediente, setExpediente] = useState<ExpedienteDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -743,7 +743,19 @@ export const ExpedienteDetail: React.FC = () => {
     try {
       if (!id) throw new Error('ID de expediente no encontrado');
       
-      await expedienteService.saveRequisito(id, requisitoId, estado, observacion);
+      const response = await expedienteService.saveRequisito(id, requisitoId, estado, observacion);
+      
+      // Check if content is inappropriate
+      if (response.isInappropriate) {
+        const badWordsText = response.badWords.length > 0 
+          ? `Palabras inapropiadas detectadas: ${response.badWords.join(', ')}`
+          : response.message;
+        showError(badWordsText);
+        return; // Don't close modal or set changes if inappropriate
+      }
+      
+      // Content is appropriate - show success and close modal
+      showSuccess('Observación guardada correctamente');
       setHasChanges(true);
       setIsEditRequisitoModalOpen(false);
       

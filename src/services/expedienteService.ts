@@ -27,13 +27,36 @@ export interface SaveRequisitoRequest {
   observacion: string;
 }
 
+// Backend response interface
+interface BackendSaveRequisitoResponse {
+  success: boolean;
+  inappropriate: boolean;
+  message: string;
+  details: {
+    bad_words: string[];
+  };
+}
+
+// Frontend response interface  
 export interface SaveRequisitoResponse {
   success: boolean;
+  isInappropriate: boolean;
   message: string;
-  data?: Record<string, unknown>;
+  badWords: string[];
 }
 
 class ExpedienteService {
+  /**
+   * Map backend save requisito response to frontend format
+   */
+  private mapSaveRequisitoResponse(backendResponse: BackendSaveRequisitoResponse): SaveRequisitoResponse {
+    return {
+      success: backendResponse.success,
+      isInappropriate: backendResponse.inappropriate,
+      message: backendResponse.message,
+      badWords: backendResponse.details?.bad_words || []
+    };
+  }
   /**
    * Get expediente details by ID
    */
@@ -87,6 +110,7 @@ class ExpedienteService {
       throw handleApiError(error);
     }
   }
+  
 
   /**
    * Save requisito changes
@@ -109,7 +133,7 @@ class ExpedienteService {
       formData.append('id_requisito', requisitoId);
       formData.append('observacion', trimmedObservacion);
 
-      const response = await apiClient.post<SaveRequisitoResponse>(
+      const response = await apiClient.post<BackendSaveRequisitoResponse>(
         '/expediente/edita_calicacion',
         formData,
         {
@@ -119,7 +143,10 @@ class ExpedienteService {
         }
       );
 
-      return response.data;
+      // Map backend response to frontend format
+      const mappedResponse = this.mapSaveRequisitoResponse(response.data);
+      
+      return mappedResponse;
     } catch (error) {
       console.error('Error saving requisito:', error);
       throw handleApiError(error);
