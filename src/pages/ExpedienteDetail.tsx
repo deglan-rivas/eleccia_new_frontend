@@ -10,6 +10,7 @@ import { type SelectedNormativas } from '../types/normativa';
 import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
 import expedienteService, { type BulkSaveRequisitoItem } from '../services/expedienteService';
+import { formatTipoResolucion } from '../utils/resolutionFormatter';
 
 export const ExpedienteDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -1116,7 +1117,7 @@ export const ExpedienteDetail: React.FC = () => {
             <div className="ml-3">
               <p className="text-gray-700 text-sm">
                 De acuerdo al análisis realizado, se recomienda emitir una 
-                <span className="font-bold text-blue-600"> {expediente.tipo_resolucion}</span> 
+                <span className="font-bold text-blue-600"> {formatTipoResolucion(expediente.tipo_resolucion)}{" "}</span> 
                 para el presente expediente, considerando el cumplimiento de los requisitos establecidos y la normativa aplicable.
               </p>
             </div>

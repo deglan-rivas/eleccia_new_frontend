@@ -151,7 +151,7 @@ class ExpedienteService {
       formData.append('observacion', trimmedObservacion);
 
       const response = await apiClient.post<BackendSaveRequisitoResponse>(
-        '/expediente/edita_calicacion',
+        '/expediente/editar_calificacion',
         formData,
         {
           headers: {
@@ -178,7 +178,7 @@ class ExpedienteService {
       const requestBody: BulkSaveRequisitoRequest = { cambios };
 
       const response = await apiClient.post<BulkSaveRequisitoResponse>(
-        '/expediente/guardar_cambios_calicacion',
+        '/expediente/guardar_cambios_calificacion',
         requestBody,
         {
           headers: {
@@ -214,7 +214,7 @@ class ExpedienteService {
       });
 
       const response = await apiClient.post<SaveRequisitoResponse>(
-        '/expediente/edita_calicacion',
+        '/expediente/editar_calificacion',
         formData,
         {
           headers: {

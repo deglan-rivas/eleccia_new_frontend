@@ -10,7 +10,7 @@ interface RequisitosTabsProps {
 }
 
 export const RequisitosTabs: React.FC<RequisitosTabsProps> = ({ tabs, onEditRequisito, editMode = false }) => {
-  const [activeTab, setActiveTab] = useState(tabs[0]?.id || '');
+  const [activeTab, setActiveTab] = useState('1');
 
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
