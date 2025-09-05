@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
+import dashboardService, { type FrontendDashboardData } from '../services/dashboardService';
 
 interface FilterData {
   num_expediente: string;
@@ -13,31 +14,8 @@ interface FilterData {
   estado: string;
 }
 
-interface ProcessData {
-  id_expediente: string;
-  nombre_expediente: string;
-  tipo_proceso: string;
-  materia: string;
-  fecha_creacion: string;
-  usuario: string;
-  estado: string;
-  archivo_resolucion?: string;
-  id_resolucion?: string;
-}
-
-interface PaginationData {
-  current_page: number;
-  per_page: number;
-  total_pages: number;
-  total_records: number;
-  has_prev: boolean;
-  has_next: boolean;
-}
-
-interface DashboardData {
-  procesos: ProcessData[];
-  pagination: PaginationData;
-}
+// Use types from the service
+type DashboardData = FrontendDashboardData;
 
 export const Dashboard: React.FC = () => {
   const [filters, setFilters] = useState<FilterData>({
@@ -62,6 +40,7 @@ export const Dashboard: React.FC = () => {
   });
 
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const tipoProcesoOptions = [
     { value: '', label: 'Todos' },
@@ -104,62 +83,60 @@ export const Dashboard: React.FC = () => {
     setFilters(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement actual search functionality
-    console.log('Searching with filters:', filters);
+    setLoading(true);
+    setCurrentPage(1); // Reset to first page when searching
+    try {
+      const data = await dashboardService.getListadoProcesados(1, filters);
+      setDashboardData(data);
+    } catch (error) {
+      console.error('Error searching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleClear = () => {
-    setFilters({
+  const handleClear = async () => {
+    const clearedFilters = {
       num_expediente: '',
       tipo_proceso: '',
       materia: '',
       fecha_desde: '',
       fecha_hasta: '',
       estado: ''
-    });
+    };
+    setFilters(clearedFilters);
+    setCurrentPage(1);
+    
+    // Refresh data with cleared filters
+    setLoading(true);
+    try {
+      const data = await dashboardService.getListadoProcesados(1, clearedFilters);
+      setDashboardData(data);
+    } catch (error) {
+      console.error('Error refreshing dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // TODO: Replace with actual data fetching
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Mock data for now
-        const mockData: DashboardData = {
-          procesos: [
-            {
-              id_expediente: '1',
-              nombre_expediente: '0025-2023-JNE',
-              tipo_proceso: 'Inscripción de Lista',
-              materia: 'Solicitud de Inscripción',
-              fecha_creacion: '2023-01-15',
-              usuario: 'admin',
-              estado: 'COMPLETADO',
-              archivo_resolucion: 'resolucion.pdf',
-              id_resolucion: '123'
-            }
-          ],
-          pagination: {
-            current_page: 1,
-            per_page: 10,
-            total_pages: 1,
-            total_records: 1,
-            has_prev: false,
-            has_next: false
-          }
-        };
-        setDashboardData(mockData);
+        const data = await dashboardService.getListadoProcesados(currentPage, filters);
+        setDashboardData(data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching dashboard data:', error);
+        // Optionally show user-friendly error message
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [currentPage, filters]);
 
   if (loading) {
     return (

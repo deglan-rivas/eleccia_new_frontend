@@ -29,6 +29,13 @@ export const EXPEDIENTE_ENDPOINTS = {
 } as const;
 
 /**
+ * Dashboard endpoints
+ */
+export const DASHBOARD_ENDPOINTS = {
+  LISTADO_PROCESADOS: '/expediente/listado_procesados'
+} as const;
+
+/**
  * User management endpoints
  */
 export const USER_ENDPOINTS = {

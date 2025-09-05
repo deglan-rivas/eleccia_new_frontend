@@ -44,7 +44,7 @@ api.interceptors.response.use(
 export const expedienteAPI = {
   analyzeExpediente: (data: Record<string, unknown>) => api.post('/analiza_expediente', data),
   getExpediente: (id: string) => api.get(`/expediente/${id}`),
-  getExpedienteList: (filters: Record<string, unknown>) => api.get('/listado_procesados', { params: filters }),
+  getExpedienteList: (filters: Record<string, unknown>) => api.get('/expediente/listado_procesados', { params: filters }),
 };
 
 export const resolucionAPI = {
