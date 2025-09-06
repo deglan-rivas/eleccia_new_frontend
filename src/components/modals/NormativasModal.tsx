@@ -4,14 +4,14 @@ import { type NormativasData, type SelectedNormativas, type LeyData, type Reglam
 interface NormativasModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (selectedNormativas: SelectedNormativas) => void;
+  onShowConsent: (selectedNormativas: SelectedNormativas) => void;
   normativasData?: NormativasData;
 }
 
 export const NormativasModal: React.FC<NormativasModalProps> = ({
   isOpen,
   onClose,
-  onConfirm,
+  onShowConsent,
   normativasData
 }) => {
   const [activeTab, setActiveTab] = useState<'leyes' | 'reglamentos'>('leyes');
@@ -150,7 +150,7 @@ export const NormativasModal: React.FC<NormativasModalProps> = ({
       })).filter(reg => reg.articulos.length > 0)
     };
 
-    onConfirm(filteredNormativas);
+    onShowConsent(filteredNormativas);
   };
 
   const isNormativaSelected = (normativaNombre: string) => {

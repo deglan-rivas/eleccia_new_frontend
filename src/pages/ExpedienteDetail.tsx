@@ -6,6 +6,7 @@ import { RequisitosTabs } from '../components/expediente/RequisitosTabs';
 import { ActionButtons } from '../components/buttons/ActionButtons';
 import { EditRequisitoModal } from '../components/modals/EditRequisitoModal';
 import { NormativasModal } from '../components/modals/NormativasModal';
+import { ConsentModal } from '../components/modals/ConsentModal';
 import { type SelectedNormativas } from '../types/normativa';
 import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
@@ -25,6 +26,8 @@ export const ExpedienteDetail: React.FC = () => {
   const [isEditRequisitoModalOpen, setIsEditRequisitoModalOpen] = useState(false);
   const [requisitoToEdit, setRequisitoToEdit] = useState<RequisitoData | null>(null);
   const [isNormativasModalOpen, setIsNormativasModalOpen] = useState(false);
+  const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
+  const [selectedNormativasForConsent, setSelectedNormativasForConsent] = useState<SelectedNormativas>({ leyes: [], reglamentos: [] });
   const [originalExpediente, setOriginalExpediente] = useState<ExpedienteDetailData | null>(null);
   const [temporaryChanges, setTemporaryChanges] = useState<Map<string, Partial<RequisitoData>>>(new Map());
   const [pendingChanges, setPendingChanges] = useState<Map<string, { requisitoId: string; estado: string; observacion: string }>>(new Map());
@@ -953,7 +956,13 @@ export const ExpedienteDetail: React.FC = () => {
     setIsNormativasModalOpen(true);
   };
 
-  const handleConfirmNormativas = async (selectedNormativas: SelectedNormativas) => {
+  const handleShowConsentModal = (selectedNormativas: SelectedNormativas) => {
+    setSelectedNormativasForConsent(selectedNormativas);
+    setIsNormativasModalOpen(false);
+    setIsConsentModalOpen(true);
+  };
+
+  const handleConfirmResolutionGeneration = async (selectedNormativas: SelectedNormativas) => {
     try {
       if (!expediente?.nombre_expediente) {
         throw new Error('Nombre del expediente no encontrado');
@@ -965,8 +974,8 @@ export const ExpedienteDetail: React.FC = () => {
       );
 
       if (response.success) {
-        setIsNormativasModalOpen(false);
-        alert('Resolución generada exitosamente');
+        setIsConsentModalOpen(false);
+        showSuccess('Resolución generada exitosamente');
         
         // Optionally refresh the page or redirect to view the resolution
         if (response.resolution_url) {
@@ -975,15 +984,21 @@ export const ExpedienteDetail: React.FC = () => {
         
         setTimeout(() => {
           window.location.reload();
-        }, 1500);
+        }, 2000);
       } else {
         throw new Error(response.message || 'Error al generar la resolución');
       }
     } catch (error) {
       console.error('Error generating resolution:', error);
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      alert(`Error al generar la resolución: ${errorMessage}`);
+      showError(`Error al generar la resolución: ${errorMessage}`);
+      setIsConsentModalOpen(false);
     }
+  };
+
+  const handleCloseConsentModal = () => {
+    setIsConsentModalOpen(false);
+    setIsNormativasModalOpen(true); // Reabrir modal de normativas
   };
 
   return (
@@ -1187,7 +1202,30 @@ export const ExpedienteDetail: React.FC = () => {
       <NormativasModal
         isOpen={isNormativasModalOpen}
         onClose={() => setIsNormativasModalOpen(false)}
-        onConfirm={handleConfirmNormativas}
+        onShowConsent={handleShowConsentModal}
+      />
+
+      {/* Modal de Consentimiento */}
+      <ConsentModal
+        isOpen={isConsentModalOpen}
+        onClose={handleCloseConsentModal}
+        onConfirm={handleConfirmResolutionGeneration}
+        selectedNormativas={selectedNormativasForConsent}
+        hasAlertRequirements={expediente?.tabs?.some(tab => 
+          tab.requisitos?.some(req => req.estado === 'ALERTA') ||
+          tab.candidatos?.some(candidato => 
+            candidato.requisitos?.some(req => req.estado === 'ALERTA')
+          )
+        )}
+        alertCount={
+          expediente?.tabs?.reduce((count, tab) => {
+            const tabAlerts = (tab.requisitos?.filter(req => req.estado === 'ALERTA')?.length || 0) +
+              (tab.candidatos?.reduce((candidatoCount, candidato) => 
+                candidatoCount + (candidato.requisitos?.filter(req => req.estado === 'ALERTA')?.length || 0), 0
+              ) || 0);
+            return count + tabAlerts;
+          }, 0) || 0
+        }
       />
 
       {/* Toast para notificaciones */}
