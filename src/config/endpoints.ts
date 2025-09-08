@@ -36,6 +36,13 @@ export const DASHBOARD_ENDPOINTS = {
 } as const;
 
 /**
+ * Resolution endpoints
+ */
+export const RESOLUTION_ENDPOINTS = {
+  GET_RESOLUTIONS: '/resultados/resoluciones'
+} as const;
+
+/**
  * User management endpoints
  */
 export const USER_ENDPOINTS = {

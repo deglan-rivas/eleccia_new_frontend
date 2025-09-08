@@ -285,7 +285,7 @@ export const Dashboard: React.FC = () => {
                         </svg>
                       </Link>
                       <Link 
-                        to={`/resoluciones/${proceso.id_expediente}`}
+                        to={`/resoluciones/${proceso.nombre_expediente}`}
                         className="text-purple-600 hover:text-purple-900 p-1 rounded-full hover:bg-purple-50"
                         title="Ver resoluciones"
                       >

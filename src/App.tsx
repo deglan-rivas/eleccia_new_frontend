@@ -19,7 +19,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="expediente/:id" element={<ExpedienteDetail />} />
-          <Route path="resoluciones/:expedienteId" element={<ResolucionList />} />
+          <Route path="resoluciones/:codigo" element={<ResolucionList />} />
           <Route path="parametros-requisitos" element={<ParametrosRequisitos />} />
         </Route>
       </Routes>
