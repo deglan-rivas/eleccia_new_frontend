@@ -32,6 +32,7 @@ export const ExpedienteDetail: React.FC = () => {
   const [temporaryChanges, setTemporaryChanges] = useState<Map<string, Partial<RequisitoData>>>(new Map());
   const [pendingChanges, setPendingChanges] = useState<Map<string, { requisitoId: string; estado: string; observacion: string }>>(new Map());
   const [isBulkSaving, setIsBulkSaving] = useState(false);
+  const [isGeneratingResolution, setIsGeneratingResolution] = useState(false);
 
   useEffect(() => {
     const fetchExpediente = async () => {
@@ -965,8 +966,10 @@ export const ExpedienteDetail: React.FC = () => {
   const handleConfirmResolutionGeneration = async (selectedNormativas: SelectedNormativas) => {
     try {
       if (!expediente?.nombre_expediente) {
-        throw new Error('Nombre del expediente no encontrado');
+        throw new Error('Código del expediente no encontrado');
       }
+
+      setIsGeneratingResolution(true);
 
       const response = await expedienteService.generateResolution(
         expediente.nombre_expediente,
@@ -975,15 +978,11 @@ export const ExpedienteDetail: React.FC = () => {
 
       if (response.success) {
         setIsConsentModalOpen(false);
-        showSuccess('Resolución generada exitosamente');
+        showSuccess(`Resolución generada exitosamente: ${response.codigo_resolucion || 'Sin código'}`);
         
-        // Optionally refresh the page or redirect to view the resolution
-        if (response.resolution_url) {
-          window.open(response.resolution_url, '_blank');
-        }
-        
+        // Redirect to resolutions dashboard for this expediente
         setTimeout(() => {
-          window.location.reload();
+          navigate(`/resoluciones/${expediente.nombre_expediente}`);
         }, 2000);
       } else {
         throw new Error(response.message || 'Error al generar la resolución');
@@ -992,11 +991,13 @@ export const ExpedienteDetail: React.FC = () => {
       console.error('Error generating resolution:', error);
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       showError(`Error al generar la resolución: ${errorMessage}`);
-      setIsConsentModalOpen(false);
+    } finally {
+      setIsGeneratingResolution(false);
     }
   };
 
   const handleCloseConsentModal = () => {
+    if (isGeneratingResolution) return; // No permitir cerrar durante la generación
     setIsConsentModalOpen(false);
     setIsNormativasModalOpen(true); // Reabrir modal de normativas
   };
@@ -1211,6 +1212,7 @@ export const ExpedienteDetail: React.FC = () => {
         onClose={handleCloseConsentModal}
         onConfirm={handleConfirmResolutionGeneration}
         selectedNormativas={selectedNormativasForConsent}
+        isLoading={isGeneratingResolution}
         hasAlertRequirements={expediente?.tabs?.some(tab => 
           tab.requisitos?.some(req => req.estado === 'ALERTA') ||
           tab.candidatos?.some(candidato => 

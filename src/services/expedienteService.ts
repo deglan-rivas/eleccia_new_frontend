@@ -17,7 +17,14 @@ export interface GenerateResolutionRequest {
 export interface GenerateResolutionResponse {
   success: boolean;
   message: string;
-  resolution_url?: string;
+  codigo_resolucion?: string;
+  archivo_resolucion?: string;
+  tipo_resolucion?: string;
+  fecha_generacion?: string;
+}
+
+export interface GenerateResolutionErrorResponse {
+  error: string;
 }
 
 export interface SaveRequisitoRequest {
@@ -107,21 +114,28 @@ class ExpedienteService {
    * Generate resolution for expediente
    */
   async generateResolution(
-    nombreExpediente: string, 
-    normativas: SelectedNormativas
+    codigoExpediente: string, 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _normativas: SelectedNormativas
   ): Promise<GenerateResolutionResponse> {
     try {
-      const response = await apiClient.post<GenerateResolutionResponse>(
-        '/generar_resolucion',
-        { normativas },
+      const response = await apiClient.post<GenerateResolutionResponse | GenerateResolutionErrorResponse>(
+        '/expediente/generar_resolucion',
+        {}, // Empty body as per the example
         {
           params: {
-            nombre_expediente: nombreExpediente
-          }
+            codigo: codigoExpediente
+          },
+          timeout: 300000 // 5 minutes timeout
         }
       );
 
-      return response.data;
+      // Handle error response format
+      if ('error' in response.data) {
+        throw new Error((response.data as GenerateResolutionErrorResponse).error);
+      }
+
+      return response.data as GenerateResolutionResponse;
     } catch (error) {
       console.error('Error generating resolution:', error);
       throw handleApiError(error);
