@@ -42,7 +42,7 @@ export interface BulkSaveRequisitoItem {
 }
 
 export interface BulkSaveRequisitoRequest {
-  cambios: BulkSaveRequisitoItem[];
+  requisitos_data: BulkSaveRequisitoItem[];
 }
 
 export interface BulkSaveRequisitoResponse {
@@ -86,7 +86,7 @@ class ExpedienteService {
    */
   async getExpedienteDetail(idExpediente: string): Promise<ExpedienteDetailData> {
     try {
-      const response = await apiClient.get<BackendExpedienteResponse>('/expediente/analisis', {
+      const response = await apiClient.get<BackendExpedienteResponse>('/resultados/analisis', {
         params: {
           codigo: idExpediente
         }
@@ -120,7 +120,7 @@ class ExpedienteService {
   ): Promise<GenerateResolutionResponse> {
     try {
       const response = await apiClient.post<GenerateResolutionResponse | GenerateResolutionErrorResponse>(
-        '/expediente/generar_resolucion',
+        '/resolucion/generar_resolucion',
         {}, // Empty body as per the example
         {
           params: {
@@ -187,14 +187,15 @@ class ExpedienteService {
   /**
    * Save multiple requisito changes in bulk
    */
-  async saveBulkRequisitos(cambios: BulkSaveRequisitoItem[]): Promise<BulkSaveRequisitoResponse> {
+  async saveBulkRequisitos(codigo: string, cambios: BulkSaveRequisitoItem[]): Promise<BulkSaveRequisitoResponse> {
     try {
-      const requestBody: BulkSaveRequisitoRequest = { cambios };
+      const requestBody: BulkSaveRequisitoRequest = { requisitos_data: cambios };
 
       const response = await apiClient.post<BulkSaveRequisitoResponse>(
         '/expediente/guardar_cambios_calificacion',
         requestBody,
         {
+          params: { codigo },
           headers: {
             'Content-Type': 'application/json',
           },

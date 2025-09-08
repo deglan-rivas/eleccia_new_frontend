@@ -22,7 +22,7 @@ export const AUTH_ENDPOINTS = {
  * Expediente endpoints
  */
 export const EXPEDIENTE_ENDPOINTS = {
-  GET_DETAIL: '/expediente/analisis',
+  GET_DETAIL: '/resultados/analisis',
   SAVE_CHANGES: '/expediente/editar_calificacion',
   GENERATE_RESOLUTION: '/generar_resolucion',
   LIST_RESOLUCIONES: '/listado_resoluciones_expediente'
@@ -32,7 +32,7 @@ export const EXPEDIENTE_ENDPOINTS = {
  * Dashboard endpoints
  */
 export const DASHBOARD_ENDPOINTS = {
-  LISTADO_PROCESADOS: '/expediente/listado_procesados'
+  LISTADO_PROCESADOS: '/resultados/listado_procesados'
 } as const;
 
 /**

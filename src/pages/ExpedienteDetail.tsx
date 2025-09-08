@@ -770,7 +770,7 @@ export const ExpedienteDetail: React.FC = () => {
       console.log('Guardando cambios masivos:', cambios);
 
       // Perform bulk save
-      const response = await expedienteService.saveBulkRequisitos(cambios);
+      const response = await expedienteService.saveBulkRequisitos(expediente.nombre_expediente, cambios);
       
       console.log('Respuesta del bulk save:', response);
 
