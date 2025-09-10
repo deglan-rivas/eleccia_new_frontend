@@ -152,7 +152,7 @@ export const Home: React.FC = () => {
       // Realizar petición POST con timeout de 5 minutos (solo para esta petición)
       const response = await apiClient.post(endpoint, {}, {
         baseURL: BACKEND_URLS.CALIFICAR_EXPEDIENTE_BASE, // Override baseURL solo para esta petición
-        timeout: 5 * 60 * 1000 // 5 minutos en milisegundos
+        timeout: 10 * 60 * 1000 // 10 minutos en milisegundos
       });
       // await fakeBackendCall({}, 68700);
       
@@ -210,10 +210,10 @@ export const Home: React.FC = () => {
 
       <div className="text-center mb-6">
         <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-          Generador de Proyectos de Resolución
+          Calificación de Expedientes
         </h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Este sistema analiza los documentos ingresados para generar proyectos de resolución para procesos jurisdiccionales.
+          Esta herramienta permite analizar y calificar expedientes según los criterios establecidos, facilitando su revisión y clasificación dentro del proceso jurisdiccional..
         </p>
       </div>
 

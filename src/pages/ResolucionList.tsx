@@ -26,7 +26,12 @@ export const ResolucionList: React.FC = () => {
       try {
         const response = await resolutionService.getResolutionsByExpediente(codigo);
         
-        const formattedResoluciones = response.resoluciones.map(resolution => 
+        // Filter only COMPLETADA resolutions and then format them
+        const completedResolutions = response.resoluciones.filter(resolution => 
+          resolution.estado === 'COMPLETADA'
+        );
+        
+        const formattedResoluciones = completedResolutions.map(resolution => 
           resolutionService.formatResolutionData(resolution)
         );
         
