@@ -7,7 +7,7 @@ export interface BackendProcesoResponse {
   id_expediente: number;
   expediente: string;
   nombre_expediente: string;
-  tipo_proceso: string;
+  tipo_expediente: string;
   materia: string;
   estado: string;
   fecha_creacion: string;
@@ -34,7 +34,7 @@ export interface BackendListadoProcesadosResponse {
 export interface FrontendProcesoData {
   id_expediente: string;
   nombre_expediente: string;
-  tipo_proceso: string;
+  tipo_expediente: string;
   materia: string;
   fecha_creacion: string;
   usuario: string;
@@ -101,7 +101,7 @@ class DashboardService {
     return {
       id_expediente: backendProceso.id_expediente.toString(),
       nombre_expediente: backendProceso.nombre_expediente,
-      tipo_proceso: this.formatTipoProceso(backendProceso.tipo_proceso),
+      tipo_expediente: this.formatTipoProceso(backendProceso.tipo_expediente),
       materia: this.formatMateria(backendProceso.materia),
       fecha_creacion: backendProceso.fecha_creacion,
       usuario: backendProceso.usuario,

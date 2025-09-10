@@ -8,7 +8,7 @@ import dashboardService, { type FrontendDashboardData } from '../services/dashbo
 
 interface FilterData {
   num_expediente: string;
-  tipo_proceso: string;
+  tipo_expediente: string;
   materia: string;
   fecha_desde: string;
   fecha_hasta: string;
@@ -22,7 +22,7 @@ type DashboardData = FrontendDashboardData;
 export const Dashboard: React.FC = () => {
   const [filters, setFilters] = useState<FilterData>({
     num_expediente: '',
-    tipo_proceso: '',
+    tipo_expediente: '',
     materia: '',
     fecha_desde: '',
     fecha_hasta: '',
@@ -45,18 +45,21 @@ export const Dashboard: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<number>(10);
 
-  const tipoProcesoOptions = [
+  // NOTE: tabla SIJE_TRF_TIPO_EXPEDIENTE
+  const tipoExpedienteOptions = [
     { value: '', label: 'Todos' },
-    { value: '1', label: 'Inscripción de Lista' },
+    { value: '13', label: 'Inscripción de Lista' },
     { value: '2', label: 'Acta Electoral' },
     { value: '3', label: 'Publicidad Estatal' },
     { value: '4', label: 'Propaganda Electoral' },
     { value: '5', label: 'Nulidad Electoral' }
   ];
 
+
+  // NOTE: tabla SIJE_TRF_MATERIA
   const materiaOptions = [
     { value: '', label: 'Todas' },
-    { value: '5', label: 'Solicitud de Inscripción' },
+    { value: '27', label: 'Solicitud de Inscripción' },
     { value: '2', label: 'Apelación' },
     { value: '3', label: 'Nulidad' },
     { value: '4', label: 'Tacha' },
@@ -106,7 +109,7 @@ export const Dashboard: React.FC = () => {
   const handleClear = async () => {
     const clearedFilters = {
       num_expediente: '',
-      tipo_proceso: '',
+      tipo_expediente: '',
       materia: '',
       fecha_desde: '',
       fecha_hasta: '',
@@ -169,8 +172,8 @@ export const Dashboard: React.FC = () => {
   return (
     <>
       <div className="text-center mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Dashboard de Resoluciones</h2>
-        <p className="text-gray-600 max-w-2xl mx-auto">Consulta y gestiona todas las resoluciones procesadas en el sistema.</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Dashboard de Expedientes</h2>
+        <p className="text-gray-600 max-w-2xl mx-auto">Consulta y gestiona todos los expedientes calificados en el sistema.</p>
       </div>
 
       {/* Filters Card */}
@@ -188,11 +191,11 @@ export const Dashboard: React.FC = () => {
             />
             
             <Select
-              label="Tipo de Proceso"
-              name="tipo_proceso"
-              value={filters.tipo_proceso}
+              label="Tipo de Expediente"
+              name="tipo_expediente"
+              value={filters.tipo_expediente}
               onChange={handleFilterChange}
-              options={tipoProcesoOptions}
+              options={tipoExpedienteOptions}
             />
             
             <Select
@@ -254,7 +257,7 @@ export const Dashboard: React.FC = () => {
       {/* Table */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden max-w-6xl mx-auto mb-6">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800">Listado de resoluciones</h3>
+          <h3 className="text-lg font-semibold text-gray-800">Listado de expedientes</h3>
         </div>
         
         <div className="overflow-x-auto">
@@ -263,7 +266,7 @@ export const Dashboard: React.FC = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N°</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expediente</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Proceso</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Expediente</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Materia</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Ingreso</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
@@ -278,7 +281,7 @@ export const Dashboard: React.FC = () => {
                     {(dashboardData.pagination.current_page - 1) * dashboardData.pagination.per_page + index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{proceso.nombre_expediente}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{proceso.tipo_proceso}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{proceso.tipo_expediente}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{proceso.materia}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{proceso.fecha_creacion}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{proceso.usuario}</td>
