@@ -14,13 +14,13 @@ export const ResolutionTable: React.FC<ResolutionTableProps> = ({
   onDownloadError
 }) => {
   const handleDownload = async (resolution: FormattedResolutionData) => {
-    if (!resolution.archivoDisponible || !resolution.archivoNombre) {
+    if (!resolution.archivoDisponible || !resolution.codigo) {
       onDownloadError?.('Archivo no disponible para descarga');
       return;
     }
 
     try {
-      await resolutionService.downloadResolution(resolution.archivoNombre);
+      await resolutionService.downloadResolution(resolution.codigo);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error al descargar el archivo';
       onDownloadError?.(errorMessage);

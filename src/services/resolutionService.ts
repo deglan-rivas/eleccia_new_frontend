@@ -103,23 +103,21 @@ class ResolutionService {
   }
 
   /**
-   * Build download URL for resolution file
+   * Build download URL for resolution file using codigo_resolucion
    */
-  buildDownloadUrl(archivo: string): string {
-    // This would typically be constructed based on your file server configuration
-    const baseUrl = import.meta.env.VITE_FILES_BASE_URL || 'http://192.168.27.222:5010/files';
-    return `${baseUrl}/resoluciones/${archivo}`;
+  buildDownloadUrl(codigoResolucion: string): string {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://192.168.27.222:5010';
+    return `${baseUrl}/descarga/descargar_resolucion?codigo_resolucion=${codigoResolucion}`;
   }
 
   /**
-   * Download resolution file
+   * Download resolution file using codigo_resolucion
    */
-  async downloadResolution(archivo: string): Promise<void> {
+  async downloadResolution(codigoResolucion: string): Promise<void> {
     try {
-      const url = this.buildDownloadUrl(archivo);
+      const url = this.buildDownloadUrl(codigoResolucion);
       const link = document.createElement('a');
       link.href = url;
-      link.download = archivo;
       link.target = '_blank';
       document.body.appendChild(link);
       link.click();
