@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
+import { Pagination } from '../components/ui/Pagination';
 import dashboardService, { type FrontendDashboardData } from '../services/dashboardService';
 
 interface FilterData {
@@ -42,6 +43,7 @@ export const Dashboard: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<number>(10);
 
   const tipoProcesoOptions = [
     { value: '', label: 'Todos' },
@@ -91,7 +93,8 @@ export const Dashboard: React.FC = () => {
     setLoading(true);
     setCurrentPage(1); // Reset to first page when searching
     try {
-      const data = await dashboardService.getListadoProcesados(1, filters);
+      const filtersWithPerPage = { ...filters, per_page: perPage };
+      const data = await dashboardService.getListadoProcesados(1, filtersWithPerPage);
       setDashboardData(data);
     } catch (error) {
       console.error('Error searching dashboard data:', error);
@@ -115,7 +118,8 @@ export const Dashboard: React.FC = () => {
     // Refresh data with cleared filters
     setLoading(true);
     try {
-      const data = await dashboardService.getListadoProcesados(1, clearedFilters);
+      const filtersWithPerPage = { ...clearedFilters, per_page: perPage };
+      const data = await dashboardService.getListadoProcesados(1, filtersWithPerPage);
       setDashboardData(data);
     } catch (error) {
       console.error('Error refreshing dashboard data:', error);
@@ -124,11 +128,22 @@ export const Dashboard: React.FC = () => {
     }
   };
 
+  // Pagination handlers
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePerPageChange = (newPerPage: number) => {
+    setPerPage(newPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const data = await dashboardService.getListadoProcesados(currentPage, filters);
+        const filtersWithPerPage = { ...filters, per_page: perPage };
+        const data = await dashboardService.getListadoProcesados(currentPage, filtersWithPerPage);
         setDashboardData(data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
@@ -139,7 +154,7 @@ export const Dashboard: React.FC = () => {
     };
 
     fetchData();
-  }, [currentPage, filters]);
+  }, [currentPage, perPage, filters]);
 
   if (loading) {
     return (
@@ -311,6 +326,18 @@ export const Dashboard: React.FC = () => {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination Component */}
+        <Pagination
+          currentPage={dashboardData.pagination.current_page}
+          totalPages={dashboardData.pagination.total_pages}
+          totalRecords={dashboardData.pagination.total_records}
+          perPage={dashboardData.pagination.per_page}
+          hasPrev={dashboardData.pagination.has_prev}
+          hasNext={dashboardData.pagination.has_next}
+          onPageChange={handlePageChange}
+          onPerPageChange={handlePerPageChange}
+        />
       </div>
     </>
   );
