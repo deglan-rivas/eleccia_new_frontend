@@ -44,6 +44,14 @@ export const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<number>(10);
+  const [appliedFilters, setAppliedFilters] = useState<FilterData>({
+    num_expediente: '',
+    tipo_expediente: '',
+    materia: '',
+    fecha_desde: '',
+    fecha_hasta: '',
+    estado: ''
+  });
 
   // NOTE: tabla SIJE_TRF_TIPO_EXPEDIENTE
   const tipoExpedienteOptions = [
@@ -95,6 +103,7 @@ export const Dashboard: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setCurrentPage(1); // Reset to first page when searching
+    setAppliedFilters(filters); // Apply the current filters
     try {
       const filtersWithPerPage = { ...filters, per_page: perPage };
       const data = await dashboardService.getListadoProcesados(1, filtersWithPerPage);
@@ -116,6 +125,7 @@ export const Dashboard: React.FC = () => {
       estado: ''
     };
     setFilters(clearedFilters);
+    setAppliedFilters(clearedFilters); // Clear applied filters too
     setCurrentPage(1);
     
     // Refresh data with cleared filters
@@ -141,23 +151,46 @@ export const Dashboard: React.FC = () => {
     setCurrentPage(1); // Reset to first page when changing items per page
   };
 
+  // Initial data load
   useEffect(() => {
+    const fetchInitialData = async () => {
+      setLoading(true);
+      try {
+        const filtersWithPerPage = { per_page: perPage };
+        const data = await dashboardService.getListadoProcesados(1, filtersWithPerPage);
+        setDashboardData(data);
+      } catch (error) {
+        console.error('Error fetching initial dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, []); // Only run once on component mount
+
+  // Handle pagination changes (when user changes page or items per page)
+  useEffect(() => {
+    if (currentPage === 1 && Object.values(appliedFilters).every(value => value === '')) {
+      // Skip if it's the initial state (handled by initial load effect)
+      return;
+    }
+
     const fetchData = async () => {
       setLoading(true);
       try {
-        const filtersWithPerPage = { ...filters, per_page: perPage };
+        const filtersWithPerPage = { ...appliedFilters, per_page: perPage };
         const data = await dashboardService.getListadoProcesados(currentPage, filtersWithPerPage);
         setDashboardData(data);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        // Optionally show user-friendly error message
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [currentPage, perPage, filters]);
+  }, [currentPage, perPage]); // Only respond to page/perPage changes, not filter changes
 
   if (loading) {
     return (
@@ -187,7 +220,7 @@ export const Dashboard: React.FC = () => {
               name="num_expediente"
               value={filters.num_expediente}
               onChange={handleFilterChange}
-              placeholder="Ej: 0025-2023-JNE"
+              placeholder="Ejm: ERM.2022005679"
             />
             
             <Select
