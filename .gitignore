@@ -23,4 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-.env
+# Ignorar todos los archivos que empiecen con .env
+.env*
+
+# Excluir .env.example y .env.template de la ignorancia
+!.env.example
+!.env.template
