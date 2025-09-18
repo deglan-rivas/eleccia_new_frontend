@@ -1,7 +1,16 @@
 import axios from 'axios';
 
+declare global {
+  interface Window {
+  env: {
+    VITE_API_BASE_URL?: string;
+    VITE_FILES_BASE_URL?: string;
+  };
+}
+}
+
 // Base URL configuration
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:7999';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || window.env?.VITE_API_BASE_URL || 'http://localhost:7999';
 
 // Create axios instance with default configuration
 const apiClient = axios.create({

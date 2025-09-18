@@ -1,0 +1,20 @@
+# Archivos de entorno
+# temporarily disallowed: create .sh file to manage environment variables dinamycally
+.env
+.env.local
+
+# Node.js
+node_modules
+dist
+
+# Archivos del sistema
+.DS_Store
+*.log
+
+# Control de versiones
+.git
+.gitignore
+
+# IDE/editor
+.vscode
+.idea

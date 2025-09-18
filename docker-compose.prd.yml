@@ -1,0 +1,39 @@
+# version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.multi-stage
+    image: deglanrivas/eleccia_frontend:1.0.0
+    container_name: saas_frontend
+    ports:
+      - "5173:80"
+    # environment:
+      # - VITE_BACKEND_URL=http://172.19.0.3:8000
+      # - VITE_BACKEND_URL=http://172.19.0.4/api
+      # - VITE_BACKEND_URL=/api
+    env_file:
+      - .env
+    depends_on:
+      - backend
+    networks:
+      - eleccia_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: deglanrivas/eleccia_backend:1.0.0
+    container_name: saas_backend
+    # environment:
+    #   - MONGO_URI=mongodb://mongodb_jne:27017
+    #   - FRONTEND_URL=http://172.19.0.4
+    env_file:
+      - .env
+    networks:
+      - eleccia_network
+
+networks:
+  eleccia_network:
+    driver: bridge
