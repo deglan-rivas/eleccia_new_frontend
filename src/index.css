@@ -66,3 +66,20 @@ body {
 .modal-backdrop {
   background-color: rgba(75, 85, 99, 0.5) !important;
 }
+
+/* Enhanced bounce animation for 404 page */
+@keyframes enhanced-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  60% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-enhanced-bounce {
+  animation: enhanced-bounce 6s ease-in-out infinite;
+}

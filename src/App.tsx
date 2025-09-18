@@ -6,6 +6,7 @@ import { ExpedienteDetail } from './pages/ExpedienteDetail';
 import { ResolucionList } from './pages/ResolucionList';
 import { Login } from './pages/Login';
 import { ParametrosRequisitos } from './pages/ParametrosRequisitos';
+import { NotFound } from './pages/NotFound';
 
 function App() {
   return (
@@ -22,6 +23,9 @@ function App() {
           <Route path="resoluciones/:codigo" element={<ResolucionList />} />
           <Route path="parametros-requisitos" element={<ParametrosRequisitos />} />
         </Route>
+        
+        {/* 404 Catch-all Route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
