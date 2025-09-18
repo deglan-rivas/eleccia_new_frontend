@@ -17,6 +17,7 @@ export interface BackendParametroResponse {
   conf_param: string | null;
   tipo_requisito: number;
   descripcion: string;
+  es_subsanable: number;
 }
 
 export interface BackendParametrosApiResponse {
@@ -41,6 +42,7 @@ export interface ConfiguracionContexto {
   parametros: ParametroConfig[];
   descripcion: string;
   habilitado: boolean;
+  esSubsanable: boolean;
 }
 
 export interface EstructuraAno {
@@ -134,7 +136,8 @@ class ParametrosService {
           categoriaRequisito: this.mapTipoRequisitoToCategory(param.tipo_requisito),
           parametros: parametrosConfigurados,
           descripcion: param.descripcion,
-          habilitado: param.id_estado === 1
+          habilitado: param.id_estado === 1,
+          esSubsanable: param.es_subsanable === 1
         };
       });
 

@@ -186,6 +186,7 @@ export interface ParametroEvaluacion {
   obligatoriedad: 'obligatorio' | 'opcional';
   nombreCriterio: 'cuerpo_lista' | 'lista_completa';
   parametros: ParametroIndividual[];
+  esSubsanable?: boolean;
 }
 
 export interface ParametroIndividual {

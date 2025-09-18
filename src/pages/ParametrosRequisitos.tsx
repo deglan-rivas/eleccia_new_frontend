@@ -29,6 +29,7 @@ interface ContextoSeleccion {
 
 interface ParametrosFormulario extends ParametroEvaluacion {
   parametrosValues: Record<string, string | number>;
+  esSubsanable: boolean;
 }
 
 export const ParametrosRequisitos: React.FC = () => {
@@ -47,7 +48,8 @@ export const ParametrosRequisitos: React.FC = () => {
     obligatoriedad: 'obligatorio',
     nombreCriterio: 'cuerpo_lista',
     parametros: [],
-    parametrosValues: {}
+    parametrosValues: {},
+    esSubsanable: false
   });
 
   const [opcionesDisponibles, setOpcionesDisponibles] = useState<{
@@ -258,7 +260,8 @@ export const ParametrosRequisitos: React.FC = () => {
             obligatoriedad: configuracionContexto.habilitado ? 'obligatorio' : 'opcional',
             nombreCriterio: 'cuerpo_lista',
             parametros: configuracionContexto.parametros || [],
-            parametrosValues
+            parametrosValues,
+            esSubsanable: configuracionContexto.esSubsanable
           });
         } else {
           // No hay configuración para este contexto
@@ -268,7 +271,8 @@ export const ParametrosRequisitos: React.FC = () => {
             obligatoriedad: 'obligatorio',
             nombreCriterio: 'cuerpo_lista',
             parametros: [],
-            parametrosValues: {}
+            parametrosValues: {},
+            esSubsanable: false
           });
         }
       }
@@ -279,7 +283,8 @@ export const ParametrosRequisitos: React.FC = () => {
         obligatoriedad: 'obligatorio',
         nombreCriterio: 'cuerpo_lista',
         parametros: [],
-        parametrosValues: {}
+        parametrosValues: {},
+        esSubsanable: false
       });
     }
   }, [contexto, parametrosData, getConfiguracionFromDynamicData]);
@@ -321,6 +326,11 @@ export const ParametrosRequisitos: React.FC = () => {
       setParametros(prev => ({
         ...prev,
         [name]: value as 'obligatorio' | 'opcional'
+      }));
+    } else if (name === 'esSubsanable') {
+      setParametros(prev => ({
+        ...prev,
+        esSubsanable: value === 'true'
       }));
     } else {
       // Para radio buttons de parámetros individuales
@@ -412,7 +422,8 @@ export const ParametrosRequisitos: React.FC = () => {
       ID_REQUISITO: parseInt(requisitoEspecifico.value),
       TIPO_REQUISITO: tipoRequisitoId,
       DESCRIPCION: parametros.descripcionRequisito,
-      CONF_PARAM: Object.keys(parametrosValues).length > 0 ? parametrosValues : {}
+      CONF_PARAM: Object.keys(parametrosValues).length > 0 ? parametrosValues : {},
+      ES_SUBSANABLE: parametros.esSubsanable ? 1 : 0
     };
   };
 
@@ -681,16 +692,28 @@ export const ParametrosRequisitos: React.FC = () => {
                       required
                     />
                     
-                    <div className="md:col-span-2">
-                      <Input
-                        label="Descripción del Requisito"
-                        name="descripcionRequisito"
-                        value={parametros.descripcionRequisito}
-                        onChange={handleParametroChange}
-                        placeholder="Descripción detallada del requisito..."
-                        required
-                      />
-                    </div>
+                    {/* <div className="md:col-span-2"> */}
+                    <Input
+                      label="Descripción del Requisito"
+                      name="descripcionRequisito"
+                      value={parametros.descripcionRequisito}
+                      onChange={handleParametroChange}
+                      placeholder="Descripción detallada del requisito..."
+                      required
+                    />
+                    {/* </div> */}
+
+                    <RadioGroup
+                      name="esSubsanable"
+                      label="¿Es subsanable?"
+                      value={parametros.esSubsanable.toString()}
+                      onChange={handleRadioChange}
+                      options={[
+                        { value: 'true', label: 'Sí' },
+                        { value: 'false', label: 'No' }
+                      ]}
+                      required
+                    />
                     
                     {/* 
                     <div className="md:col-span-2">
@@ -778,7 +801,8 @@ export const ParametrosRequisitos: React.FC = () => {
                     obligatoriedad: 'obligatorio',
                     nombreCriterio: 'cuerpo_lista',
                     parametros: [],
-                    parametrosValues: {}
+                    parametrosValues: {},
+                    esSubsanable: false
                   });
                 }}
               >
