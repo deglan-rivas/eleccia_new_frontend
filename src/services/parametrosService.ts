@@ -13,6 +13,7 @@ export interface BackendParametroResponse {
   idmateria: number;
   txmateria: string;
   id_requisito: number;
+  nombre_requisito: string;
   id_estado: number;
   conf_param: string | null;
   tipo_requisito: number;
@@ -107,7 +108,8 @@ class ParametrosService {
         tiposEleccion.set(param.idtipoeleccion, param.txtipoeleccion.toLowerCase());
         tiposExpediente.set(param.idtipoexpediente, param.txtipoexpediente.toLowerCase());
         tiposMateria.set(param.idmateria, param.txmateria.toLowerCase());
-        requisitosEspecificos.set(param.id_requisito, this.getRequisitoName(param.id_requisito));
+        // requisitosEspecificos.set(param.id_requisito, this.getRequisitoName(param.id_requisito));
+        requisitosEspecificos.set(param.id_requisito, param.nombre_requisito);
 
         // Build nested configuration structure
         const tipoProceso = param.idtipoproceso.toString();
@@ -173,30 +175,30 @@ class ParametrosService {
   /**
    * Get descriptive name for requisito based on ID and description
    */
-  private getRequisitoName(idRequisito: number): string {
-    // Map common requisito IDs to readable names
-    const requisitoNames: Record<number, string> = {
-      1: 'Cuota de Género',
-      2: 'Cuota Joven', 
-      4: 'Alternancia de Género',
-      5: 'Solicitud Firmada',
-      6: 'Acta Plazo',
-      7: 'Ubigeo Electoral',
-      8: 'Lista Candidatos Acta',
-      9: 'Comprobante de Pago',
-      10: 'Ubigeo Candidato',
-      11: 'DDJJ Consentimiento',
-      12: 'DDJJ No Deuda',
-      18: 'Plan Gobierno',
-      19: 'Verificación ROP',
-      20: 'Cantidad Regidores',
-      21: 'DDJJ Plazo',
-      22: 'Ubigeo Plan Gobierno',
-      23: 'Comité Electoral'
-    };
+  // private getRequisitoName(idRequisito: number): string {
+  //   // Map common requisito IDs to readable names
+  //   const requisitoNames: Record<number, string> = {
+  //     1: 'Cuota de Género',
+  //     2: 'Cuota Joven', 
+  //     4: 'Alternancia de Género',
+  //     5: 'Solicitud Firmada',
+  //     6: 'Acta Plazo',
+  //     7: 'Ubigeo Electoral',
+  //     8: 'Lista Candidatos Acta',
+  //     9: 'Comprobante de Pago',
+  //     10: 'Ubigeo Candidato',
+  //     11: 'DDJJ Consentimiento',
+  //     12: 'DDJJ No Deuda',
+  //     18: 'Plan Gobierno',
+  //     19: 'Verificación ROP',
+  //     20: 'Cantidad Regidores',
+  //     21: 'DDJJ Plazo',
+  //     22: 'Ubigeo Plan Gobierno',
+  //     23: 'Órgano Electoral Partidario'
+  //   };
 
-    return requisitoNames[idRequisito] || `Requisito ${idRequisito}`;
-  }
+  //   return requisitoNames[idRequisito] || `Requisito ${idRequisito}`;
+  // }
 
   /**
    * Map configuration object to frontend parametros structure
