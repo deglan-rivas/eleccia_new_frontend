@@ -297,33 +297,33 @@ export const Dashboard: React.FC = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N°</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expediente</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Expediente</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Materia</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Ingreso</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N°</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expediente</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Expediente</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Materia</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Ingreso</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {dashboardData.procesos.map((proceso, index) => (
                 <tr key={proceso.id_expediente}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                     {(dashboardData.pagination.current_page - 1) * dashboardData.pagination.per_page + index + 1}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{proceso.nombre_expediente}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{proceso.tipo_expediente}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{proceso.materia}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{proceso.fecha_creacion}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{proceso.usuario}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{proceso.nombre_expediente}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500"><div className='w-48 truncate'>{proceso.tipo_expediente}</div></td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{proceso.materia}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{proceso.fecha_creacion}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{proceso.usuario}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getEstadoBadgeClass(proceso.estado)}`}>
                       {proceso.estado}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex space-x-2">
                       <Link 
                         to={`/expediente/${proceso.nombre_expediente}`}

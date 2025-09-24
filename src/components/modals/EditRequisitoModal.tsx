@@ -46,7 +46,7 @@ export const EditRequisitoModal: React.FC<EditRequisitoModalProps> = ({
             <h3 className="text-lg font-semibold text-gray-800">Editar Requisito</h3>
             <button 
               onClick={handleClose}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 hover:text-gray-700 hover:cursor-pointer"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -87,13 +87,13 @@ export const EditRequisitoModal: React.FC<EditRequisitoModalProps> = ({
               <button 
                 type="button" 
                 onClick={handleClose}
-                className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-300 hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-300"
               >
                 Cancelar
               </button>
               <button 
                 type="submit" 
-                className="px-4 py-2 bg-jne-red text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 Guardar Cambios
               </button>

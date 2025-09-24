@@ -1102,7 +1102,7 @@ export const ExpedienteDetail: React.FC = () => {
             <button 
               type="button" 
               onClick={() => setIsInformeModalOpen(true)}
-              className="text-jne-red hover:text-red-700 flex items-center text-sm font-medium"
+              className="text-red-600 hover:text-red-700 hover:cursor-pointer flex items-center text-sm font-medium"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

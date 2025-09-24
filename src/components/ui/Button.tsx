@@ -21,10 +21,10 @@ export const Button: React.FC<ButtonProps> = ({
   onClick,
   className = ''
 }) => {
-  const baseClasses = 'rounded-lg shadow-sm flex items-center justify-center transition-colors font-medium focus:outline-none focus:ring-2';
+  const baseClasses = 'rounded-lg shadow-sm flex items-center justify-center transition-colors font-medium focus:outline-none focus:ring-2 hover:cursor-pointer';
   
   const variantClasses = {
-    primary: 'bg-jne-red hover:bg-red-700 text-white focus:ring-red-500',
+    primary: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500',
     secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800 focus:ring-gray-400',
     danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500',
     success: 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500'

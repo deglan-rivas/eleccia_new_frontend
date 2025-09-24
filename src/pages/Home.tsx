@@ -6,6 +6,7 @@ import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
 import { BACKEND_ENDPOINTS, BACKEND_URLS } from '../config/endpoints';
 import apiClient from '../config/axios';
+import { Link } from 'react-router-dom';
 
 interface FormData {
   num_expediente: string;
@@ -147,11 +148,11 @@ export const Home: React.FC = () => {
       // Construir URL con query parameter para el backend específico
       const endpoint = `${BACKEND_ENDPOINTS.CALIFICAR_EXPEDIENTE}?codigo=${encodeURIComponent(expedienteFormateado)}`;
       
-      console.log('🚀 Enviando petición al backend:', `${BACKEND_URLS.CALIFICAR_EXPEDIENTE_BASE}${endpoint}`);
+      console.log('🚀 Enviando petición al backend:', `${endpoint}`);
       
       // Realizar petición POST con timeout de 5 minutos (solo para esta petición)
       const response = await apiClient.post(endpoint, {}, {
-        baseURL: BACKEND_URLS.CALIFICAR_EXPEDIENTE_BASE, // Override baseURL solo para esta petición
+        // baseURL: BACKEND_URLS.CALIFICAR_EXPEDIENTE_BASE, // Override baseURL solo para esta petición
         timeout: 10 * 60 * 1000 // 10 minutos en milisegundos
       });
       // await fakeBackendCall({}, 68700);
@@ -294,14 +295,14 @@ export const Home: React.FC = () => {
                   <p className="font-medium">Procesamiento completado exitosamente</p>
                   <p className="text-green-600">
                     El expediente <span className="font-mono font-medium">{success.expediente}</span> se procesó exitosamente en {success.processingTime} y ya se puede revisar en el{' '}
-                    <a 
-                      href={success.dashboardUrl} 
+                    <Link
+                      to={success.dashboardUrl} // Esto reemplaza el href
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-green-800 hover:text-green-900 underline font-medium"
                     >
                       dashboard
-                    </a>
+                    </Link>
                   </p>
                 </div>
               </div>

@@ -74,30 +74,30 @@ export const ResolutionTable: React.FC<ResolutionTableProps> = ({
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Código de Resolución
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Usuario
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Tipo Resolución
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Estado
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Fecha Creación
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Acciones
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {resolutions.map((resolution) => (
-              <tr key={resolution.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
+              <tr key={resolution.id} className="hover:bg-gray-100">
+                <td className="px-2 py-3 whitespace-nowrap">
                   <div className="flex flex-col">
                     <div className="text-sm font-medium text-gray-900 font-mono">
                       {resolution.codigo}
@@ -112,18 +112,18 @@ export const ResolutionTable: React.FC<ResolutionTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-2 py-3 whitespace-nowrap text-center">
                   <div className="text-sm text-gray-900">{resolution.usuario}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-2 py-3 whitespace-nowrap text-center">
                   <div className="text-sm text-gray-900">{resolution.tipoResolucion}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-2 py-3 whitespace-nowrap text-center">
                   <span className={getEstadoBadgeClasses(resolution.estadoBadge.color)}>
                     {resolution.estadoBadge.text}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-2 py-3 whitespace-nowrap text-center">
                   <div className="flex flex-col">
                     <div className="text-sm text-gray-900">{resolution.fechaCreacion}</div>
                     {resolution.fechaModificacion !== resolution.fechaCreacion && (
@@ -133,12 +133,12 @@ export const ResolutionTable: React.FC<ResolutionTableProps> = ({
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex space-x-2">
+                <td className="px-2 py-3 whitespace-nowrap text-right text-sm font-medium">
+                  <div className="flex space-x-2 justify-center">
                     {resolution.archivoDisponible ? (
                       <button
                         onClick={() => handleDownload(resolution)}
-                        className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-jne-red bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                        className="inline-flex justify-center items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md text-jne-red bg-red-50 hover:bg-red-100 hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -176,11 +176,11 @@ export const ResolutionTable: React.FC<ResolutionTableProps> = ({
         </div>
         <div className="flex items-center space-x-4">
           <div className="flex items-center">
-            <div className="w-3 h-3 bg-green-100 rounded-full mr-1"></div>
+            <div className="w-3 h-3 bg-green-200 rounded-full mr-1"></div>
             <span className="text-xs">Completada</span>
           </div>
           <div className="flex items-center">
-            <div className="w-3 h-3 bg-yellow-100 rounded-full mr-1"></div>
+            <div className="w-3 h-3 bg-yellow-200 rounded-full mr-1"></div>
             <span className="text-xs">Pendiente</span>
           </div>
         </div>

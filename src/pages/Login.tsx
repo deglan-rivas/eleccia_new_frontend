@@ -150,7 +150,7 @@ export const Login: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-9 text-gray-500 hover:text-gray-700 transition-colors"
+                  className="absolute right-3 top-9 text-gray-500 hover:text-gray-700 hover:cursor-pointer transition-colors"
                 >
                   {showPassword ? (
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,7 +176,7 @@ export const Login: React.FC = () => {
                 
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-jne-red hover:text-red-700 transition-colors"
+                  className="text-sm text-red-500 hover:text-red-700 transition-colors"
                 >
                   ¿Olvidaste tu contraseña?
                 </Link>
@@ -185,7 +185,7 @@ export const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-jne-red hover:bg-red-700 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-md transition-colors duration-200 flex items-center justify-center"
+                className="w-full bg-red-600 hover:bg-red-700 hover:cursor-pointer disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-md transition-colors duration-200 flex items-center justify-center"
               >
                 {isLoading ? (
                   <>
@@ -218,7 +218,7 @@ export const Login: React.FC = () => {
                 ¿No tienes cuenta?{' '}
                 <Link
                   to="/register"
-                  className="text-jne-red hover:text-red-700 font-medium transition-colors"
+                  className="text-red-600 hover:text-red-700 font-medium transition-colors"
                 >
                   Regístrate aquí
                 </Link>

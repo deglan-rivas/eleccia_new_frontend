@@ -68,10 +68,10 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         <button
           onClick={handleEditToggle}
           disabled={isSaving}
-          className={`px-6 py-3 text-white rounded-lg shadow-sm transition-colors flex items-center ${
+          className={`px-6 py-3 text-white rounded-lg shadow-sm transition-colors flex items-center hover:cursor-pointer ${
             editMode
               ? 'bg-green-600 hover:bg-green-700'
-              : 'bg-jne-red hover:bg-red-700'
+              : 'bg-red-600 hover:bg-red-700'
           } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {isSaving ? (
@@ -102,7 +102,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         {/* Botón Cancelar Edición */}
         <button
           onClick={handleCancelEdit}
-          className={`px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg shadow-sm transition-colors flex items-center ${
+          className={`px-6 py-3 bg-gray-500 hover:bg-gray-600 hover:cursor-pointer text-white rounded-lg shadow-sm transition-colors flex items-center ${
             editMode ? '' : 'hidden'
           }`}
         >
@@ -116,7 +116,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         <button
           onClick={handleVerResoluciones}
           disabled={isSaving}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-800 hover:cursor-pointer text-white rounded-lg shadow-sm transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

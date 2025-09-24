@@ -17,7 +17,7 @@ export const Navigation: React.FC = () => {
         <div className="flex space-x-8">
           <Link
             to="/"
-            className={`inline-flex items-center px-1 pt-1 pb-4 border-b-2 text-sm font-medium transition-colors ${
+            className={`inline-flex items-center px-1 py-3 border-b-2 text-sm font-medium transition-colors ${
               isActive('/')
                 ? 'border-jne-red text-jne-red'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -32,7 +32,7 @@ export const Navigation: React.FC = () => {
           
           <Link
             to="/dashboard"
-            className={`inline-flex items-center px-1 pt-1 pb-4 border-b-2 text-sm font-medium transition-colors ${
+            className={`inline-flex items-center px-1 py-3 border-b-2 text-sm font-medium transition-colors ${
               isActive('/dashboard')
                 ? 'border-jne-red text-jne-red'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -46,7 +46,7 @@ export const Navigation: React.FC = () => {
           
           <Link
             to="/parametros-requisitos"
-            className={`inline-flex items-center px-1 pt-1 pb-4 border-b-2 text-sm font-medium transition-colors ${
+            className={`inline-flex items-center px-1 py-3 border-b-2 text-sm font-medium transition-colors ${
               isActive('/parametros-requisitos')
                 ? 'border-jne-red text-jne-red'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'

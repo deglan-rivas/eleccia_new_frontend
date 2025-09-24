@@ -13,7 +13,7 @@ export const GenerateResolutionButton: React.FC<GenerateResolutionButtonProps> =
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-sm transition-colors flex items-center ${
+      className={`px-6 py-3 bg-green-600 hover:bg-green-700 hover:cursor-pointer text-white rounded-lg shadow-sm transition-colors flex items-center ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       }`}
     >

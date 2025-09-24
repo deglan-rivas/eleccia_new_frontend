@@ -67,7 +67,7 @@ export const ExpedienteInfoSection: React.FC<ExpedienteInfoSectionProps> = ({
         <div className="flex-shrink-0 ml-6">
           <button
             onClick={handleViewAnalysis}
-            className="inline-flex items-center px-4 py-2 bg-jne-red text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+            className="inline-flex items-center px-4 py-2 bg-jne-red text-white text-sm font-medium rounded-md hover:bg-red-700 hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 

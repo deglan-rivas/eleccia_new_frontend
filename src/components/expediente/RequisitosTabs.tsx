@@ -23,7 +23,7 @@ export const RequisitosTabs: React.FC<RequisitosTabsProps> = ({ tabs, onEditRequ
           {tabs.sort((a, b) => Number(a.id) - Number(b.id)).map((tab) => (
             <li key={tab.id} className="mr-2">
               <button 
-                className={`inline-block p-4 border-b-2 transition-colors ${
+                className={`inline-block p-4 border-b-2 transition-colors hover:cursor-pointer ${
                   activeTab === tab.id
                     ? 'text-jne-red border-jne-red'
                     : 'text-gray-500 hover:text-gray-700 border-transparent'
