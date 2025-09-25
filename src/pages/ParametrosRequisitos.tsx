@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { Select } from '../components/ui/Select';
 import { Input } from '../components/ui/Input';
@@ -42,15 +42,12 @@ export const ParametrosRequisitos: React.FC = () => {
     requisitoEspecifico: ''
   });
 
-  const [parametros, setParametros] = useState<ParametrosFormulario>({
-    categoriaRequisito: '',
-    descripcionRequisito: '',
-    obligatoriedad: 'obligatorio',
-    nombreCriterio: 'cuerpo_lista',
-    parametros: [],
-    parametrosValues: {},
-    esSubsanable: false
-  });
+  const [parametros, setParametros] = useState<ParametrosFormulario | null>(null);
+  const [parametrosModificados, setParametrosModificados] = useState(false);
+  
+  // Almacena las modificaciones por requisito específico
+  const modificacionesPorRequisito = useRef<Record<string, ParametrosFormulario>>({});
+  const requisitoActualRef = useRef<string>('');
 
   const [opcionesDisponibles, setOpcionesDisponibles] = useState<{
     tiposProcesoElectoral: SelectOption[];
@@ -245,52 +242,69 @@ export const ParametrosRequisitos: React.FC = () => {
                               contexto.tipoMateria && contexto.requisitoEspecifico;
       
       if (contextoCompleto) {
-        // Obtener configuración específica del contexto desde datos dinámicos
-        const configuracionContexto = getConfiguracionFromDynamicData(contexto.ano, contexto);
+        const requisitoKey = contexto.requisitoEspecifico;
         
-        if (configuracionContexto) {
-          const parametrosValues: Record<string, string | number> = {};
-          (configuracionContexto.parametros || []).forEach(param => {
-            parametrosValues[param.nombre] = param.valor;
-          });
-          
-          setParametros({
-            categoriaRequisito: configuracionContexto.categoriaRequisito,
-            descripcionRequisito: configuracionContexto.descripcion,
-            obligatoriedad: configuracionContexto.habilitado ? 'obligatorio' : 'opcional',
-            nombreCriterio: 'cuerpo_lista',
-            parametros: configuracionContexto.parametros || [],
-            parametrosValues,
-            esSubsanable: configuracionContexto.esSubsanable
-          });
+        // Guardar las modificaciones del requisito anterior si existe
+        if (requisitoActualRef.current && parametros && parametrosModificados) {
+          modificacionesPorRequisito.current[requisitoActualRef.current] = { ...parametros };
+        }
+        
+        // Actualizar el requisito actual
+        requisitoActualRef.current = requisitoKey;
+        
+        // Verificar si ya tenemos modificaciones guardadas para este requisito
+        const modificacionGuardada = modificacionesPorRequisito.current[requisitoKey];
+        
+        if (modificacionGuardada) {
+          // Usar las modificaciones guardadas
+          setParametros(modificacionGuardada);
+          setParametrosModificados(true);
         } else {
-          // No hay configuración para este contexto
-          setParametros({
-            categoriaRequisito: '',
-            descripcionRequisito: '',
-            obligatoriedad: 'obligatorio',
-            nombreCriterio: 'cuerpo_lista',
-            parametros: [],
-            parametrosValues: {},
-            esSubsanable: false
-          });
+          // Cargar desde el backend
+          const configuracionContexto = getConfiguracionFromDynamicData(contexto.ano, contexto);
+          
+          if (configuracionContexto) {
+            const parametrosValues: Record<string, string | number> = {};
+            (configuracionContexto.parametros || []).forEach(param => {
+              parametrosValues[param.nombre] = param.valor;
+            });
+            
+            setParametros({
+              categoriaRequisito: configuracionContexto.categoriaRequisito,
+              descripcionRequisito: configuracionContexto.descripcion,
+              obligatoriedad: configuracionContexto.habilitado ? 'obligatorio' : 'opcional',
+              nombreCriterio: 'cuerpo_lista',
+              parametros: configuracionContexto.parametros || [],
+              parametrosValues,
+              esSubsanable: configuracionContexto.esSubsanable
+            });
+            setParametrosModificados(false);
+          } else {
+            // No hay configuración para este contexto
+            setParametros({
+              categoriaRequisito: '',
+              descripcionRequisito: '',
+              obligatoriedad: 'obligatorio',
+              nombreCriterio: 'cuerpo_lista',
+              parametros: [],
+              parametrosValues: {},
+              esSubsanable: false
+            });
+            setParametrosModificados(false);
+          }
         }
       }
     } else {
-      setParametros({
-        categoriaRequisito: '',
-        descripcionRequisito: '',
-        obligatoriedad: 'obligatorio',
-        nombreCriterio: 'cuerpo_lista',
-        parametros: [],
-        parametrosValues: {},
-        esSubsanable: false
-      });
+      // Reset cuando no hay requisito específico seleccionado
+      setParametros(null);
+      setParametrosModificados(false);
+      requisitoActualRef.current = '';
     }
-  }, [contexto, parametrosData, getConfiguracionFromDynamicData]);
+  }, [contexto.requisitoEspecifico, parametrosData, getConfiguracionFromDynamicData]);
 
   const handleContextoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
+    
     setContexto(prev => ({
       ...prev,
       [name]: value
@@ -299,39 +313,42 @@ export const ParametrosRequisitos: React.FC = () => {
 
   const handleParametroChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setParametros(prev => ({
+    setParametrosModificados(true);
+    setParametros(prev => prev ? ({
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    }));
+    }) : null);
   };
 
   const handleParametroValueChange = (parametroNombre: string, value: string | number) => {
-    setParametros(prev => ({
+    setParametrosModificados(true);
+    setParametros(prev => prev ? ({
       ...prev,
       parametrosValues: {
         ...prev.parametrosValues,
         [parametroNombre]: value
       }
-    }));
+    }) : null);
   };
 
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    setParametrosModificados(true);
     if (name === 'nombreCriterio') {
-      setParametros(prev => ({
+      setParametros(prev => prev ? ({
         ...prev,
         [name]: value as 'cuerpo_lista' | 'lista_completa'
-      }));
+      }) : null);
     } else if (name === 'obligatoriedad') {
-      setParametros(prev => ({
+      setParametros(prev => prev ? ({
         ...prev,
         [name]: value as 'obligatorio' | 'opcional'
-      }));
+      }) : null);
     } else if (name === 'esSubsanable') {
-      setParametros(prev => ({
+      setParametros(prev => prev ? ({
         ...prev,
         esSubsanable: value === 'true'
-      }));
+      }) : null);
     } else {
       // Para radio buttons de parámetros individuales
       handleParametroValueChange(name, value);
@@ -339,7 +356,7 @@ export const ParametrosRequisitos: React.FC = () => {
   };
 
   const isFormValid = () => {
-    if (!contexto.requisitoEspecifico || !parametros.categoriaRequisito || !parametros.descripcionRequisito.trim()) {
+    if (!contexto.requisitoEspecifico || !parametros || !parametros.categoriaRequisito || !parametros.descripcionRequisito.trim()) {
       return false;
     }
     
@@ -435,6 +452,11 @@ export const ParametrosRequisitos: React.FC = () => {
       // Simular delay de red
       // await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // Verificar que parametros no sea null
+      if (!parametros) {
+        throw new Error('No hay parámetros configurados');
+      }
+      
       // Actualizar la configuración en el contexto jerárquico
       updateConfiguracionContexto(contexto, parametros.parametrosValues);
       
@@ -494,7 +516,7 @@ export const ParametrosRequisitos: React.FC = () => {
   const showRestoBloques = Boolean(contexto.requisitoEspecifico);
 
   const renderParametro = (param: ParametroIndividual) => {
-    const currentValue = parametros.parametrosValues[param.nombre] || param.valor;
+    const currentValue = parametros?.parametrosValues?.[param.nombre] || param.valor;
     
     switch (param.tipo) {
       case 'number':
@@ -574,6 +596,9 @@ export const ParametrosRequisitos: React.FC = () => {
       </div>
     );
   }
+
+  console.log('contexto: ', contexto)
+  console.log('parametros: ', parametros)
 
   return (
     <div className="space-y-6">
@@ -685,7 +710,7 @@ export const ParametrosRequisitos: React.FC = () => {
                     <Select
                       label="Categoría del requisito"
                       name="categoriaRequisito"
-                      value={parametros.categoriaRequisito}
+                      value={parametros?.categoriaRequisito || ''}
                       onChange={handleParametroChange}
                       options={CATEGORIAS_REQUISITO}
                       placeholder="Seleccione la categoría"
@@ -696,7 +721,7 @@ export const ParametrosRequisitos: React.FC = () => {
                     <Input
                       label="Descripción del Requisito"
                       name="descripcionRequisito"
-                      value={parametros.descripcionRequisito}
+                      value={parametros?.descripcionRequisito || ''}
                       onChange={handleParametroChange}
                       placeholder="Descripción detallada del requisito..."
                       required
@@ -706,7 +731,7 @@ export const ParametrosRequisitos: React.FC = () => {
                     <RadioGroup
                       name="esSubsanable"
                       label="¿Es subsanable?"
-                      value={parametros.esSubsanable.toString()}
+                      value={parametros?.esSubsanable?.toString() || 'false'}
                       onChange={handleRadioChange}
                       options={[
                         { value: 'true', label: 'Sí' },
@@ -746,7 +771,7 @@ export const ParametrosRequisitos: React.FC = () => {
             
             <div className="ml-11 space-y-6">
               {/* Parámetros dinámicos */}
-              {parametros.parametros.length > 0 ? (
+              {parametros?.parametros && parametros.parametros.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {parametros.parametros.map((param) => renderParametro(param))}
                 </div>
@@ -795,15 +820,10 @@ export const ParametrosRequisitos: React.FC = () => {
                     tipoMateria: '',
                     requisitoEspecifico: ''
                   });
-                  setParametros({
-                    categoriaRequisito: '',
-                    descripcionRequisito: '',
-                    obligatoriedad: 'obligatorio',
-                    nombreCriterio: 'cuerpo_lista',
-                    parametros: [],
-                    parametrosValues: {},
-                    esSubsanable: false
-                  });
+                  setParametros(null);
+                  setParametrosModificados(false);
+                  modificacionesPorRequisito.current = {};
+                  requisitoActualRef.current = '';
                 }}
               >
                 Cancelar
