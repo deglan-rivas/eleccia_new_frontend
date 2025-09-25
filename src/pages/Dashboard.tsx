@@ -152,29 +152,29 @@ export const Dashboard: React.FC = () => {
   };
 
   // Initial data load
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      setLoading(true);
-      try {
-        const filtersWithPerPage = { per_page: perPage };
-        const data = await dashboardService.getListadoProcesados(1, filtersWithPerPage);
-        setDashboardData(data);
-      } catch (error) {
-        console.error('Error fetching initial dashboard data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchInitialData = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const filtersWithPerPage = { per_page: perPage };
+  //       const data = await dashboardService.getListadoProcesados(1, filtersWithPerPage);
+  //       setDashboardData(data);
+  //     } catch (error) {
+  //       console.error('Error fetching initial dashboard data:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchInitialData();
-  }, []); // Only run once on component mount
+  //   fetchInitialData();
+  // }, []); // Only run once on component mount
 
   // Handle pagination changes (when user changes page or items per page)
   useEffect(() => {
-    if (currentPage === 1 && Object.values(appliedFilters).every(value => value === '')) {
-      // Skip if it's the initial state (handled by initial load effect)
-      return;
-    }
+    // if (currentPage === 1 && Object.values(appliedFilters).every(value => value === '')) {
+    //   // Skip if it's the initial state (handled by initial load effect)
+    //   return;
+    // }
 
     const fetchData = async () => {
       setLoading(true);
