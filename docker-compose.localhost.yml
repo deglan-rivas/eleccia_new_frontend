@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.multi-stage
-    image: deglanrivas/eleccia_frontend:1.0.0
+    image: deglanrivas/eleccia_frontend:1.1.0
     container_name: eleccia_frontend
     ports:
       - "5173:80"

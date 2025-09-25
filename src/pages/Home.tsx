@@ -4,7 +4,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
-import { BACKEND_ENDPOINTS, BACKEND_URLS } from '../config/endpoints';
+import { BACKEND_ENDPOINTS } from '../config/endpoints';
 import apiClient from '../config/axios';
 import { Link } from 'react-router-dom';
 
