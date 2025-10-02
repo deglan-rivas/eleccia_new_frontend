@@ -107,7 +107,7 @@ class DashboardService {
       tipo_expediente: this.formatTipoProceso(backendProceso.tipo_expediente),
       materia: this.formatMateria(backendProceso.materia),
       fecha_creacion: backendProceso.fecha_creacion,
-      fecha_modificacion: backendProceso.fecha_creacion,
+      fecha_modificacion: backendProceso.fecha_actualizacion,
       usuario: backendProceso.usuario,
       estado: this.formatEstado(backendProceso.estado),
       archivo_resolucion: backendProceso.archivo_resolucion || undefined,
