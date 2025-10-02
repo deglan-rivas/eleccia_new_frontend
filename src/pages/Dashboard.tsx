@@ -302,6 +302,7 @@ export const Dashboard: React.FC = () => {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Expediente</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Materia</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Ingreso</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Modificación</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -317,6 +318,7 @@ export const Dashboard: React.FC = () => {
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500"><div className='w-48 truncate'>{proceso.tipo_expediente}</div></td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{proceso.materia}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{proceso.fecha_creacion}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{proceso.fecha_modificacion}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{proceso.usuario}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getEstadoBadgeClass(proceso.estado)}`}>

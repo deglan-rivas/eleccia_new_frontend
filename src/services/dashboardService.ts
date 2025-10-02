@@ -11,6 +11,7 @@ export interface BackendProcesoResponse {
   materia: string;
   estado: string;
   fecha_creacion: string;
+  fecha_actualizacion: string;
   usuario: string;
   archivo_resolucion: string | null;
   id_resolucion: number | null;
@@ -37,6 +38,7 @@ export interface FrontendProcesoData {
   tipo_expediente: string;
   materia: string;
   fecha_creacion: string;
+  fecha_modificacion: string;
   usuario: string;
   estado: string;
   archivo_resolucion?: string;
@@ -76,6 +78,7 @@ class DashboardService {
       }
 
       const response = await apiClient.get<BackendListadoProcesadosResponse>(`${DASHBOARD_ENDPOINTS.LISTADO_PROCESADOS}?${params.toString()}`);
+      console.log('response de erick: ', response)
       
       return this.mapBackendResponseToFrontend(response.data);
     } catch (error) {
@@ -104,6 +107,7 @@ class DashboardService {
       tipo_expediente: this.formatTipoProceso(backendProceso.tipo_expediente),
       materia: this.formatMateria(backendProceso.materia),
       fecha_creacion: backendProceso.fecha_creacion,
+      fecha_modificacion: backendProceso.fecha_creacion,
       usuario: backendProceso.usuario,
       estado: this.formatEstado(backendProceso.estado),
       archivo_resolucion: backendProceso.archivo_resolucion || undefined,
