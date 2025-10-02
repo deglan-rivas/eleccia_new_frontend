@@ -14,13 +14,6 @@ export const NormativasModal: React.FC<NormativasModalProps> = ({
   onShowConsent,
   normativasData
 }) => {
-  const [activeTab, setActiveTab] = useState<'leyes' | 'reglamentos'>('leyes');
-  const [selectedNormativas, setSelectedNormativas] = useState<SelectedNormativas>({
-    leyes: [],
-    reglamentos: []
-  });
-  const [selectedArticulos, setSelectedArticulos] = useState<Record<string, Set<string>>>({});
-
   // Mock data - En producción esto vendría del backend
   const mockNormativas: NormativasData = normativasData || {
     leyes: [
@@ -62,11 +55,59 @@ export const NormativasModal: React.FC<NormativasModalProps> = ({
     ]
   };
 
+  const [activeTab, setActiveTab] = useState<'leyes' | 'reglamentos'>('leyes');
+  
+  // Initialize with all normativas selected by default
+  const [selectedNormativas, setSelectedNormativas] = useState<SelectedNormativas>(() => ({
+    leyes: mockNormativas.leyes.map(ley => ({
+      nombre: ley.nombre,
+      articulos: ley.articulos.map(art => art.id)
+    })),
+    reglamentos: mockNormativas.reglamentos.map(reg => ({
+      nombre: reg.nombre,
+      articulos: reg.articulos.map(art => art.id)
+    }))
+  }));
+  
+  // Initialize with all articles selected by default
+  const [selectedArticulos, setSelectedArticulos] = useState<Record<string, Set<string>>>(() => {
+    const inicial: Record<string, Set<string>> = {};
+    
+    // Add all leyes articles
+    mockNormativas.leyes.forEach(ley => {
+      inicial[ley.nombre] = new Set(ley.articulos.map(art => art.id));
+    });
+    
+    // Add all reglamentos articles
+    mockNormativas.reglamentos.forEach(reg => {
+      inicial[reg.nombre] = new Set(reg.articulos.map(art => art.id));
+    });
+    
+    return inicial;
+  });
+
   useEffect(() => {
     if (!isOpen) {
-      // Reset state when modal closes
-      setSelectedNormativas({ leyes: [], reglamentos: [] });
-      setSelectedArticulos({});
+      // Reset state when modal closes - restore all selected by default
+      setSelectedNormativas({
+        leyes: mockNormativas.leyes.map(ley => ({
+          nombre: ley.nombre,
+          articulos: ley.articulos.map(art => art.id)
+        })),
+        reglamentos: mockNormativas.reglamentos.map(reg => ({
+          nombre: reg.nombre,
+          articulos: reg.articulos.map(art => art.id)
+        }))
+      });
+      
+      const resetArticulos: Record<string, Set<string>> = {};
+      mockNormativas.leyes.forEach(ley => {
+        resetArticulos[ley.nombre] = new Set(ley.articulos.map(art => art.id));
+      });
+      mockNormativas.reglamentos.forEach(reg => {
+        resetArticulos[reg.nombre] = new Set(reg.articulos.map(art => art.id));
+      });
+      setSelectedArticulos(resetArticulos);
     }
   }, [isOpen]);
 
