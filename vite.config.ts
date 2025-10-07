@@ -10,7 +10,12 @@ export default defineConfig({
   ],
   server: {
     // host: '0.0.0.0'
-    host: true
+    host: true,
+    allowedHosts: [
+        'localhost',
+        '.trycloudflare.com', // permite todos los subdominios de trycloudflare.com
+        // 'segment-device-indie-carolina.trycloudflare.com/' // o específicamente tu dominio
+      ]
   }
   // server: {
   //   proxy: {
