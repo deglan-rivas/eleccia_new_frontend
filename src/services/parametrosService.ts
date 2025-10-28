@@ -28,6 +28,24 @@ export interface BackendParametrosApiResponse {
   status: string;
 }
 
+export interface BackendTipoRequisitoResponse {
+  id_tipo_requisito: number;
+  nombre_tipo_requisito: string;
+  descripcion: string;
+}
+
+export interface BackendTiposRequisitoApiResponse {
+  message: string;
+  total: number;
+  tipos_requisito: BackendTipoRequisitoResponse[];
+  status: string;
+}
+
+export interface TipoRequisitoOption extends SelectOption {
+  id: number;
+  descripcion: string;
+}
+
 export interface ParametroConfig {
   nombre: string;
   unidad: string;
@@ -61,6 +79,37 @@ export interface FrontendParametrosStructure {
 }
 
 class ParametrosService {
+  /**
+   * Get all tipos de requisito (categories) from backend
+   */
+  async getTiposRequisito(): Promise<TipoRequisitoOption[]> {
+    try {
+      const response = await apiClient.get<BackendTiposRequisitoApiResponse>('/plataforma/tipos_requisito');
+      
+      console.log('Backend tipos requisito response:', response.data);
+      
+      // Transform to frontend SelectOption format with additional metadata
+      return response.data.tipos_requisito.map(tipo => ({
+        value: tipo.id_tipo_requisito.toString(),
+        label: tipo.nombre_tipo_requisito,
+        id: tipo.id_tipo_requisito,
+        descripcion: tipo.descripcion
+      }));
+    } catch (error) {
+      console.error('Error fetching tipos requisito:', error);
+      throw handleApiError(error);
+    }
+  }
+
+  /**
+   * Get ID mapping for tipo requisito by value
+   * Helper method to convert from string value to numeric ID
+   */
+  getTipoRequisitoIdByValue(tiposRequisito: TipoRequisitoOption[], value: string): number | null {
+    const tipo = tiposRequisito.find(t => t.value === value);
+    return tipo ? tipo.id : null;
+  }
+
   /**
    * Get all parameters from backend and transform to frontend structure
    */
@@ -135,7 +184,7 @@ class ParametrosService {
         }
 
         configuraciones[tipoProceso][tipoEleccion][tipoExpediente][tipoMateria][requisitoId] = {
-          categoriaRequisito: this.mapTipoRequisitoToCategory(param.tipo_requisito),
+          categoriaRequisito: param.tipo_requisito.toString(), // Store as string ID directly
           parametros: parametrosConfigurados,
           descripcion: param.descripcion,
           habilitado: param.id_estado === 1,
@@ -158,47 +207,6 @@ class ParametrosService {
       ESTRUCTURA_POR_ANO: estructuraPorAno
     };
   }
-
-  /**
-   * Map tipo_requisito number to category string
-   */
-  private mapTipoRequisitoToCategory(tipoRequisito: number): string {
-    switch (tipoRequisito) {
-      case 1: return 'solicitud_inscripcion';
-      case 2: return 'acta_eleccion_interna';
-      case 3: return 'hoja_vida_candidato';
-      case 4: return 'plan_gobierno';
-      default: return 'otros';
-    }
-  }
-
-  /**
-   * Get descriptive name for requisito based on ID and description
-   */
-  // private getRequisitoName(idRequisito: number): string {
-  //   // Map common requisito IDs to readable names
-  //   const requisitoNames: Record<number, string> = {
-  //     1: 'Cuota de Género',
-  //     2: 'Cuota Joven', 
-  //     4: 'Alternancia de Género',
-  //     5: 'Solicitud Firmada',
-  //     6: 'Acta Plazo',
-  //     7: 'Ubigeo Electoral',
-  //     8: 'Lista Candidatos Acta',
-  //     9: 'Comprobante de Pago',
-  //     10: 'Ubigeo Candidato',
-  //     11: 'DDJJ Consentimiento',
-  //     12: 'DDJJ No Deuda',
-  //     18: 'Plan Gobierno',
-  //     19: 'Verificación ROP',
-  //     20: 'Cantidad Regidores',
-  //     21: 'DDJJ Plazo',
-  //     22: 'Ubigeo Plan Gobierno',
-  //     23: 'Órgano Electoral Partidario'
-  //   };
-
-  //   return requisitoNames[idRequisito] || `Requisito ${idRequisito}`;
-  // }
 
   /**
    * Map configuration object to frontend parametros structure

@@ -8,15 +8,32 @@ import { Button } from '../components/ui/Button';
 import { Toast } from '../components/ui/Toast';
 import { useToast } from '../hooks/useToast';
 import { PARAMETROS_ENDPOINTS, buildUrl } from '../config/endpoints';
-import parametrosService, { type FrontendParametrosStructure } from '../services/parametrosService';
-import { 
-  CATEGORIAS_REQUISITO,
-  ID_MAPPINGS,
-  updateConfiguracionContexto,
-  type ParametroEvaluacion,
-  type ParametroIndividual
-} from '../constants/parametros.temp';
+import parametrosService, { 
+  type FrontendParametrosStructure,
+  type TipoRequisitoOption 
+} from '../services/parametrosService';
 import { type SelectOption } from '../types';
+
+interface ParametroIndividual {
+  nombre: string;
+  unidad: string;
+  tipo: 'number' | 'select' | 'radio' | 'date';
+  valor: string | number;
+  opciones?: SelectOption[];
+  min?: number;
+  max?: number;
+  step?: number;
+  obligatorio: boolean;
+}
+
+interface ParametroEvaluacion {
+  categoriaRequisito: string;
+  descripcionRequisito: string;
+  obligatoriedad: 'obligatorio' | 'opcional';
+  nombreCriterio: 'cuerpo_lista' | 'lista_completa';
+  parametros: ParametroIndividual[];
+  esSubsanable?: boolean;
+}
 
 interface ContextoSeleccion {
   ano: string;
@@ -66,6 +83,7 @@ export const ParametrosRequisitos: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingParametros, setIsLoadingParametros] = useState(true);
   const [parametrosData, setParametrosData] = useState<FrontendParametrosStructure | null>(null);
+  const [tiposRequisito, setTiposRequisito] = useState<TipoRequisitoOption[]>([]);
   const { toast, showSuccess, showError, hideToast } = useToast();
 
   // Funciones auxiliares para manejar configuración dinámica
@@ -92,9 +110,18 @@ export const ParametrosRequisitos: React.FC = () => {
     const loadParametros = async () => {
       try {
         setIsLoadingParametros(true);
-        const data = await parametrosService.getParametros();
-        console.log('Datos cargados del backend:', data);
-        setParametrosData(data);
+        
+        // Cargar parámetros y tipos de requisito en paralelo
+        const [parametrosData, tiposRequisitoData] = await Promise.all([
+          parametrosService.getParametros(),
+          parametrosService.getTiposRequisito()
+        ]);
+        
+        console.log('Datos cargados del backend:', parametrosData);
+        console.log('Tipos de requisito cargados:', tiposRequisitoData);
+        
+        setParametrosData(parametrosData);
+        setTiposRequisito(tiposRequisitoData);
       } catch (error) {
         console.error('Error loading parametros:', error);
         showError('Error al cargar parámetros del backend');
@@ -424,8 +451,8 @@ export const ParametrosRequisitos: React.FC = () => {
       throw new Error('No se pudieron encontrar los IDs correspondientes para la configuración seleccionada');
     }
 
-    // Get the TIPO_REQUISITO ID from the selected category
-    const tipoRequisitoId = ID_MAPPINGS.CATEGORIAS_REQUISITO[parametros.categoriaRequisito as keyof typeof ID_MAPPINGS.CATEGORIAS_REQUISITO];
+    // Get the TIPO_REQUISITO ID from the categoriaRequisito (which is now stored as string ID)
+    const tipoRequisitoId = parseInt(parametros.categoriaRequisito);
     
     console.log('🔍 Mapping categoriaRequisito:', parametros.categoriaRequisito, 'to ID:', tipoRequisitoId);
     console.log('parametros: ', parametros)
@@ -456,9 +483,6 @@ export const ParametrosRequisitos: React.FC = () => {
       if (!parametros) {
         throw new Error('No hay parámetros configurados');
       }
-      
-      // Actualizar la configuración en el contexto jerárquico
-      updateConfiguracionContexto(contexto, parametros.parametrosValues);
       
       // Generar objeto de salida según especificaciones
       const objetoSalida = generarObjetoSalida(contexto, parametros.parametrosValues, parametros);
@@ -712,7 +736,7 @@ export const ParametrosRequisitos: React.FC = () => {
                       name="categoriaRequisito"
                       value={parametros?.categoriaRequisito || ''}
                       onChange={handleParametroChange}
-                      options={CATEGORIAS_REQUISITO}
+                      options={tiposRequisito}
                       placeholder="Seleccione la categoría"
                       required
                     />
