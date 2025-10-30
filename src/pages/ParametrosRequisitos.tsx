@@ -41,6 +41,7 @@ interface ContextoSeleccion {
   tipoEleccion: string;
   tipoExpediente: string;
   tipoMateria: string;
+  categoriaRequisito: string;
   requisitoEspecifico: string;
 }
 
@@ -56,6 +57,7 @@ export const ParametrosRequisitos: React.FC = () => {
     tipoEleccion: '',
     tipoExpediente: '',
     tipoMateria: '',
+    categoriaRequisito: '',
     requisitoEspecifico: ''
   });
 
@@ -84,6 +86,7 @@ export const ParametrosRequisitos: React.FC = () => {
   const [isLoadingParametros, setIsLoadingParametros] = useState(true);
   const [parametrosData, setParametrosData] = useState<FrontendParametrosStructure | null>(null);
   const [tiposRequisito, setTiposRequisito] = useState<TipoRequisitoOption[]>([]);
+  const [categoriasDisponibles, setCategoriasDisponibles] = useState<TipoRequisitoOption[]>([]);
   const { toast, showSuccess, showError, hideToast } = useToast();
 
   // Funciones auxiliares para manejar configuración dinámica
@@ -150,6 +153,7 @@ export const ParametrosRequisitos: React.FC = () => {
         tipoEleccion: '',
         tipoExpediente: '',
         tipoMateria: '',
+        categoriaRequisito: '',
         requisitoEspecifico: ''
       }));
     } else {
@@ -178,6 +182,7 @@ export const ParametrosRequisitos: React.FC = () => {
         tipoEleccion: '',
         tipoExpediente: '',
         tipoMateria: '',
+        categoriaRequisito: '',
         requisitoEspecifico: ''
       }));
     } else {
@@ -204,6 +209,7 @@ export const ParametrosRequisitos: React.FC = () => {
         ...prev,
         tipoExpediente: '',
         tipoMateria: '',
+        categoriaRequisito: '',
         requisitoEspecifico: ''
       }));
     } else {
@@ -217,17 +223,48 @@ export const ParametrosRequisitos: React.FC = () => {
   }, [contexto.tipoEleccion, contexto.ano, parametrosData, getOptionsForYear]);
 
   useEffect(() => {
-    if (contexto.tipoExpediente && parametrosData && contexto.ano) {
-      const opcionesAno = getOptionsForYear(contexto.ano);
-      const nuevasOpciones = opcionesAno.TIPOS_MATERIA || [];
-      setOpcionesDisponibles(prev => ({
-        ...prev,
-        tiposMateria: nuevasOpciones
-      }));
+    if (contexto.tipoExpediente && parametrosData && contexto.ano && 
+        contexto.tipoProcesoElectoral && contexto.tipoEleccion) {
+      
+      // Obtener las materias filtradas por el contexto
+      const configuraciones = parametrosData.ESTRUCTURA_POR_ANO?.[contexto.ano]?.CONFIGURACIONES;
+      
+      if (configuraciones) {
+        const materiasParaContexto = configuraciones[contexto.tipoProcesoElectoral]
+          ?.[contexto.tipoEleccion]
+          ?.[contexto.tipoExpediente];
+        
+        if (materiasParaContexto) {
+          // Obtener solo los IDs de materias que existen en este contexto
+          const materiasIds = Object.keys(materiasParaContexto);
+          
+          // Filtrar TIPOS_MATERIA para mostrar solo las válidas
+          const opcionesAno = getOptionsForYear(contexto.ano);
+          const materiasFiltradas = opcionesAno.TIPOS_MATERIA.filter(materia => 
+            materiasIds.includes(materia.value)
+          );
+          
+          setOpcionesDisponibles(prev => ({
+            ...prev,
+            tiposMateria: materiasFiltradas
+          }));
+        } else {
+          setOpcionesDisponibles(prev => ({
+            ...prev,
+            tiposMateria: []
+          }));
+        }
+      } else {
+        setOpcionesDisponibles(prev => ({
+          ...prev,
+          tiposMateria: []
+        }));
+      }
       
       setContexto(prev => ({
         ...prev,
         tipoMateria: '',
+        categoriaRequisito: '',
         requisitoEspecifico: ''
       }));
     } else {
@@ -237,28 +274,123 @@ export const ParametrosRequisitos: React.FC = () => {
         requisitosEspecificos: []
       }));
     }
-  }, [contexto.tipoExpediente, contexto.ano, parametrosData, getOptionsForYear]);
+  }, [contexto.tipoExpediente, contexto.ano, contexto.tipoProcesoElectoral, 
+      contexto.tipoEleccion, parametrosData, getOptionsForYear]);
 
+  // Efecto para filtrar requisitos específicos por materia (y opcionalmente por categoría)
   useEffect(() => {
-    if (contexto.tipoMateria && parametrosData && contexto.ano) {
-      const opcionesAno = getOptionsForYear(contexto.ano);
-      const nuevasOpciones = opcionesAno.REQUISITOS_ESPECIFICOS || [];
-      setOpcionesDisponibles(prev => ({
-        ...prev,
-        requisitosEspecificos: nuevasOpciones
-      }));
+    if (contexto.tipoMateria && parametrosData && contexto.ano && 
+        contexto.tipoProcesoElectoral && contexto.tipoEleccion && contexto.tipoExpediente) {
       
-      setContexto(prev => ({
-        ...prev,
-        requisitoEspecifico: ''
-      }));
+      // Obtener los requisitos filtrados por el contexto completo
+      const configuraciones = parametrosData.ESTRUCTURA_POR_ANO?.[contexto.ano]?.CONFIGURACIONES;
+      
+      if (configuraciones) {
+        const requisitosParaContexto = configuraciones[contexto.tipoProcesoElectoral]
+          ?.[contexto.tipoEleccion]
+          ?.[contexto.tipoExpediente]
+          ?.[contexto.tipoMateria];
+        
+        if (requisitosParaContexto) {
+          let requisitosIds = Object.keys(requisitosParaContexto);
+          
+          // Si hay una categoría seleccionada, filtrar por ella
+          if (contexto.categoriaRequisito) {
+            requisitosIds = requisitosIds.filter(reqId => {
+              const config = requisitosParaContexto[reqId];
+              return config.categoriaRequisito === contexto.categoriaRequisito;
+            });
+          }
+          
+          // Filtrar REQUISITOS_ESPECIFICOS para mostrar solo los válidos
+          const opcionesAno = getOptionsForYear(contexto.ano);
+          const requisitosFiltrados = opcionesAno.REQUISITOS_ESPECIFICOS.filter(req => 
+            requisitosIds.includes(req.value)
+          );
+          
+          setOpcionesDisponibles(prev => ({
+            ...prev,
+            requisitosEspecificos: requisitosFiltrados
+          }));
+        } else {
+          // No hay configuraciones para este contexto
+          setOpcionesDisponibles(prev => ({
+            ...prev,
+            requisitosEspecificos: []
+          }));
+        }
+      } else {
+        setOpcionesDisponibles(prev => ({
+          ...prev,
+          requisitosEspecificos: []
+        }));
+      }
+      
+      // Limpiar requisito específico si la categoría cambió
+      if (contexto.categoriaRequisito) {
+        setContexto(prev => ({
+          ...prev,
+          requisitoEspecifico: ''
+        }));
+      }
     } else {
       setOpcionesDisponibles(prev => ({
         ...prev,
         requisitosEspecificos: []
       }));
     }
-  }, [contexto.tipoMateria, contexto.ano, parametrosData, getOptionsForYear]);
+  }, [contexto.tipoMateria, contexto.categoriaRequisito, contexto.ano, contexto.tipoProcesoElectoral, 
+      contexto.tipoEleccion, contexto.tipoExpediente, parametrosData, getOptionsForYear]);
+
+  // Efecto para filtrar las categorías disponibles según el contexto seleccionado (materia)
+  useEffect(() => {
+    if (contexto.tipoMateria && parametrosData && tiposRequisito.length > 0) {
+      const contextoBase = contexto.ano && contexto.tipoProcesoElectoral && 
+                          contexto.tipoEleccion && contexto.tipoExpediente && 
+                          contexto.tipoMateria;
+      
+      if (contextoBase) {
+        try {
+          // Obtener TODAS las configuraciones para este contexto (todos los requisitos)
+          const configuracionesPorRequisito = parametrosData?.ESTRUCTURA_POR_ANO?.[contexto.ano]
+            ?.CONFIGURACIONES?.[contexto.tipoProcesoElectoral]?.[contexto.tipoEleccion]
+            ?.[contexto.tipoExpediente]?.[contexto.tipoMateria];
+          
+          if (configuracionesPorRequisito) {
+            // Extraer todas las categorías únicas de todas las configuraciones
+            const categoriasIds = new Set<string>();
+            Object.values(configuracionesPorRequisito).forEach((config: any) => {
+              if (config.categoriaRequisito) {
+                categoriasIds.add(config.categoriaRequisito);
+              }
+            });
+            
+            // Filtrar tiposRequisito para mostrar solo las categorías que existen en este contexto
+            const categoriasFiltradas = tiposRequisito.filter(tipo => 
+              categoriasIds.has(tipo.value)
+            );
+            
+            console.log('Categorías encontradas en contexto:', Array.from(categoriasIds));
+            console.log('Categorías filtradas:', categoriasFiltradas);
+            
+            setCategoriasDisponibles(categoriasFiltradas.length > 0 ? categoriasFiltradas : tiposRequisito);
+          } else {
+            // Si no hay configuraciones, mostrar todas las opciones
+            setCategoriasDisponibles(tiposRequisito);
+          }
+        } catch (error) {
+          console.error('Error filtrando categorías:', error);
+          setCategoriasDisponibles(tiposRequisito);
+        }
+      } else {
+        setCategoriasDisponibles(tiposRequisito);
+      }
+    } else {
+      // Si no hay materia seleccionada, mostrar todas las categorías
+      setCategoriasDisponibles(tiposRequisito);
+    }
+  }, [contexto.tipoMateria, contexto.ano, contexto.tipoProcesoElectoral,
+      contexto.tipoEleccion, contexto.tipoExpediente, parametrosData, tiposRequisito]);
 
   // Efecto para autocompletar parámetros cuando se selecciona un requisito específico
   useEffect(() => {
@@ -717,7 +849,19 @@ export const ParametrosRequisitos: React.FC = () => {
 
             <div className="ml-11">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Requisito Específico - A la izquierda */}
+                {/* Categoría del Requisito - Primero, se habilita cuando hay materia */}
+                <Select
+                  label="Categoría del requisito"
+                  name="categoriaRequisito"
+                  value={contexto.categoriaRequisito}
+                  onChange={handleContextoChange}
+                  options={categoriasDisponibles}
+                  placeholder="Seleccione la categoría"
+                  disabled={!contexto.tipoMateria || categoriasDisponibles.length === 0}
+                  required
+                />
+
+                {/* Requisito Específico - Se filtra por categoría */}
                 <Select
                   label="Requisito Específico"
                   name="requisitoEspecifico"
@@ -725,23 +869,13 @@ export const ParametrosRequisitos: React.FC = () => {
                   onChange={handleContextoChange}
                   options={opcionesDisponibles.requisitosEspecificos}
                   placeholder="Seleccione el requisito específico"
+                  disabled={!contexto.categoriaRequisito}
                   required
                 />
                 
                 {/* Resto del bloque 2 - Solo se muestra si hay requisito seleccionado */}
                 {showRestoBloques && (
                   <>
-                    <Select
-                      label="Categoría del requisito"
-                      name="categoriaRequisito"
-                      value={parametros?.categoriaRequisito || ''}
-                      onChange={handleParametroChange}
-                      options={tiposRequisito}
-                      placeholder="Seleccione la categoría"
-                      required
-                    />
-                    
-                    {/* <div className="md:col-span-2"> */}
                     <Input
                       label="Descripción del Requisito"
                       name="descripcionRequisito"
@@ -842,6 +976,7 @@ export const ParametrosRequisitos: React.FC = () => {
                     tipoEleccion: '',
                     tipoExpediente: '',
                     tipoMateria: '',
+                    categoriaRequisito: '',
                     requisitoEspecifico: ''
                   });
                   setParametros(null);
