@@ -504,10 +504,54 @@ export const ParametrosRequisitos: React.FC = () => {
         [name]: value as 'obligatorio' | 'opcional'
       }) : null);
     } else if (name === 'esSubsanable') {
-      setParametros(prev => prev ? ({
-        ...prev,
-        esSubsanable: value === 'true'
-      }) : null);
+      const esSubsanableNuevo = value === 'true';
+      setParametros(prev => {
+        if (!prev) return null;
+
+        const nuevosParametros = [...prev.parametros];
+        const nuevosValores = { ...prev.parametrosValues };
+
+        // Buscar si ya existe el parámetro de Plazo de Subsanación
+        const nombrePlazo = 'Plazo de subsanación';
+        const idx = nuevosParametros.findIndex(p => 
+          p.nombre.toLowerCase().includes('plazo') &&
+          p.nombre.toLowerCase().includes('subsan')
+        );
+
+        if (!esSubsanableNuevo) {
+          // Guardar valor actual antes de eliminarlo (si existía)
+          if (nuevosValores[nombrePlazo] !== undefined) {
+            nuevosValores._backupPlazoSubsanacion = nuevosValores[nombrePlazo];
+          }
+          // Eliminar parámetro y valor
+          if (idx !== -1) nuevosParametros.splice(idx, 1);
+          delete nuevosValores[nombrePlazo];
+        } else {
+          // Restaurar si hay backup previo
+          const valorPrevio = nuevosValores._backupPlazoSubsanacion ?? 0;
+          delete nuevosValores._backupPlazoSubsanacion;
+
+          // Si no existe el parámetro, agregarlo
+          if (idx === -1) {
+            nuevosParametros.push({
+              nombre: nombrePlazo,
+              unidad: 'días',
+              tipo: 'number',
+              valor: valorPrevio,
+              obligatorio: true
+            });
+          }
+
+          nuevosValores[nombrePlazo] = valorPrevio;
+        }
+
+        return {
+          ...prev,
+          esSubsanable: esSubsanableNuevo,
+          parametros: nuevosParametros,
+          parametrosValues: nuevosValores
+        };
+      });
     } else {
       // Para radio buttons de parámetros individuales
       handleParametroValueChange(name, value);
